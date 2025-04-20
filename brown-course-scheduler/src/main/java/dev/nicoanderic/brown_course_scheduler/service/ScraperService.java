@@ -22,15 +22,16 @@ public class ScraperService {
   private final ChromeDriver driver;
   private final ArrayList<ScrapeCourse> courses;
 
-  public ScraperService(ChromeDriver driver, ArrayList<ScrapeCourse> courses) {
+  public ScraperService(ChromeDriver driver) {
     this.driver = driver;
-    this.courses = courses;
+    this.courses = new ArrayList<>();
   }
 
   @PostConstruct
   void postConstruct() {
     scrape();
     System.out.println("done!");
+    System.out.println(courses.size());
   }
 
   public void scrape() {
