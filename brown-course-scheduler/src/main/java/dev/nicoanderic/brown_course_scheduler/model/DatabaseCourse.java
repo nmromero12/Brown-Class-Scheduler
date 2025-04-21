@@ -24,6 +24,34 @@ public class DatabaseCourse {
   public DatabaseCourse() {
   }
 
+  public Integer getId() {
+    return id;
+  }
+
+  public String getCourseCode() {
+    return courseCode;
+  }
+
+  public String getCourseName() {
+    return courseName;
+  }
+
+  public String getExamTime() {
+    return examTime;
+  }
+
+  public String getSection() {
+    return section;
+  }
+
+  public String getClassTime() {
+    return classTime;
+  }
+
+  public String getCrn() {
+    return crn;
+  }
+
   public DatabaseCourse(String courseCode, String courseName, String examTime, String section, String classTime, String crn, Integer id) {
     this.courseCode = courseCode;
     this.courseName = courseName;

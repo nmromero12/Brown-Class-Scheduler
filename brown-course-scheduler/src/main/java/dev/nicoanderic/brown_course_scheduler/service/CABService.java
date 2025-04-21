@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hibernate.dialect.Database;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -39,7 +40,7 @@ public class CABService {
     headers.setContentType(MediaType.APPLICATION_JSON);
 
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < courses.size(); i++) {
       Map<String, Object> tempMap = new HashMap<>();
       Map<String, String> payload = new HashMap<>();
       payload.put("group", "code:" +  courses.get(i).getCode());
@@ -80,5 +81,16 @@ public class CABService {
 
 
 
+  }
+
+  public List<DatabaseCourse> getCourseByCode(String coursecode) {
+    return courseRepository.findByCourseCode(coursecode);
+  }
+
+  public Object getCoursebyid(Integer id) {
+    Map<String, DatabaseCourse> courseMap = new HashMap<>();
+    DatabaseCourse course = courseRepository.findByid(id);
+    courseMap.put("course", course);
+    return courseMap;
   }
 }
