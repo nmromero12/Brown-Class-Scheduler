@@ -29,9 +29,9 @@ public class ScraperService {
 
   @PostConstruct
   void postConstruct() {
-    scrape();
+//    scrape();
     System.out.println("done!");
-    System.out.println(courses.size());
+//    System.out.println(courses.size());
   }
 
   public void scrape() {

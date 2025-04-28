@@ -73,8 +73,16 @@ public class CABService {
     return responseMap;
   }
 
-  public List<DatabaseCourse> getCourseByCode(String coursecode) {
-    return courseRepository.findByCourseCode(coursecode);
+  public Object getCourseByCode(String coursecode) {
+    Map<String, Object> courseMap = new HashMap<>();
+    List<DatabaseCourse> courses = courseRepository.findByCourseCode(coursecode);
+    if (courses.isEmpty()) {
+      courseMap.put("Error", "Cannot find course based on that course code");
+    }
+    else {
+      courseMap.put("Success", courses);
+    }
+    return courseMap;
   }
 
   public Object getCoursebyid(Integer id) {

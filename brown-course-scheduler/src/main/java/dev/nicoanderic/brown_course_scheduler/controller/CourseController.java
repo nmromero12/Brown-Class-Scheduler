@@ -30,8 +30,8 @@ public class CourseController {
 
 
   @GetMapping("/code/{courseCode}")
-  public ResponseEntity<List<DatabaseCourse>> fetchCourseCode(@PathVariable String courseCode) {
-    return ResponseEntity.ok(cabService.getCourseByCode(courseCode));
+  public Object fetchCourseCode(@PathVariable String courseCode) {
+    return cabService.getCourseByCode(courseCode);
   }
 
   @GetMapping("/id/{id}")
