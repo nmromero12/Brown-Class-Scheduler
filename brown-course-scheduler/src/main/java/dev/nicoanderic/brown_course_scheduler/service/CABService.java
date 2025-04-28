@@ -88,9 +88,14 @@ public class CABService {
   }
 
   public Object getCoursebyid(Integer id) {
-    Map<String, DatabaseCourse> courseMap = new HashMap<>();
+    Map<String, Object> courseMap = new HashMap<>();
     DatabaseCourse course = courseRepository.findByid(id);
-    courseMap.put("course", course);
+    if (course == null) {
+      courseMap.put("Error", "Cannot find course based on that id");
+    }
+    else {
+      courseMap.put("course", course);
+    }
     return courseMap;
   }
 }
