@@ -77,10 +77,12 @@ public class CABService {
     Map<String, Object> courseMap = new HashMap<>();
     List<DatabaseCourse> courses = courseRepository.findByCourseCode(coursecode);
     if (courses.isEmpty()) {
-      courseMap.put("Error", "Cannot find course based on that course code");
+      courseMap.put("result", "error");
+      courseMap.put("message", "no course found for that code");
     }
     else {
-      courseMap.put("Success", courses);
+      courseMap.put("result", "success");
+      courseMap.put("courses", courses);
     }
     return courseMap;
   }
