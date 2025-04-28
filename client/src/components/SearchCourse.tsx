@@ -19,6 +19,8 @@ interface Course {
 export function SearchCourse() {
     const [searchCode, setSearchCode] = useState(""); 
     const [courses, setCourses] = useState<Course[] | null>(null);
+    const [resultMessage, setResultMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchCode(event.target.value);
@@ -26,30 +28,25 @@ export function SearchCourse() {
 
 
     async function fetchCourses() {
+        setIsLoading(true);
         try {
             const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`)
-            if (!response.ok) throw new Error("Failed fetching data");
             const data = await response.json()
             if (data.result == "success") {
                 setCourses(data.courses);
                 console.log(data.courses);
+            } else {
+                setCourses(null);
+                setResultMessage(data.message);
             }
                 
         } catch (error) {
             console.error("fetch error:", error);
+        } finally {
+            setIsLoading(false);
         }
 
     }
-
-
-    
-
-    
-
-
-
-    
-
    
     return (
         <div>
@@ -61,21 +58,27 @@ export function SearchCourse() {
             <button onClick={fetchCourses}>Submit</button>
 
             <div>
-      {courses && courses.length > 0 ? (
-        <ul>
-          {courses.map((course) => (
-            <li key={course.id}>
-              <strong>{course.courseCode}</strong>: {course.courseName} — Section {course.section}<br />
-              Class Time: {course.classTime}, Exam Time: {course.examTime}, CRN: {course.crn}
-            </li>
-          ))}
-        </ul>
-      ) : courses === null ? (
-        <p>Enter a course code and click submit.</p>
-      ) : (
-        <p>No courses found.</p>
-      )}
-    </div>
+                {courses ? (
+                    <>
+                        <h1>Courses Found</h1>
+                        <ul>
+                            {courses.map((course) => (
+                                <li key={course.courseCode}>
+                                    <p>Course Name: {course.courseName}</p>
+                                    <p>Final Exam: {course.examTime}</p>
+                                    <p>Class Time: {course.classTime}</p>
+                                    <p>Section: {course.section}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                    
+    
+                    
+                ) : (
+                    <p>{resultMessage}</p>
+                )}
+            </div>
             
         </div>
         
