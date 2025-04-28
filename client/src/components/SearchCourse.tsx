@@ -30,6 +30,7 @@ export function SearchCourse() {
 
     async function fetchCourses() {
         setIsLoading(true);
+        setCourses(null)
         try {
             const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`)
             const data = await response.json()
@@ -88,7 +89,7 @@ export function SearchCourse() {
                                     className="p-4 border border-gray-200 rounded-md shadow-sm bg-gray-50"
                                 >
                                     <p><strong>Course Name:</strong> {course.courseName}</p>
-                                    <p><strong>Final Exam:</strong> {course.examTime}</p>
+                                    <p><strong>Final Exam:</strong> {course.examTime ? course.examTime: "No final exam found"}</p>
                                     <p><strong>Class Time:</strong> {course.classTime}</p>
                                     <p><strong>Section:</strong> {course.section}</p>
                                 </li>
