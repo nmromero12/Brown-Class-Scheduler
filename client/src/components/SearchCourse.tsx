@@ -30,7 +30,8 @@ export function SearchCourse() {
 
     async function fetchCourses() {
         setIsLoading(true);
-        setCourses(null)
+        setCourses(null);
+        setError(null);
         try {
             const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`)
             const data = await response.json()
@@ -61,7 +62,7 @@ export function SearchCourse() {
                     type="text"
                     value={searchCode}
                     onChange={handleInputChange}
-                    placeholder="Enter Course Code"
+                    placeholder="Enter Course Code (Please use uppercase)"
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
@@ -85,14 +86,19 @@ export function SearchCourse() {
                         <ul className="space-y-4">
                             {courses.map((course) => (
                                 <li
-                                    key={course.courseCode}
-                                    className="p-4 border border-gray-200 rounded-md shadow-sm bg-gray-50"
-                                >
-                                    <p><strong>Course Name:</strong> {course.courseName}</p>
-                                    <p><strong>Final Exam:</strong> {course.examTime ? course.examTime: "No final exam found"}</p>
-                                    <p><strong>Class Time:</strong> {course.classTime}</p>
-                                    <p><strong>Section:</strong> {course.section}</p>
-                                </li>
+                                key={course.id}
+                                className="p-4 border border-gray-200 rounded-md shadow-sm bg-gray-50 flex flex-col"
+                              >
+                                <p><strong>Course Name:</strong> {course.courseName}</p>
+                                <p><strong>Final Exam:</strong> {course.examTime ? course.examTime : "No final exam found"}</p>
+                                <p><strong>Class Time:</strong> {course.classTime}</p>
+                                <p><strong>Section:</strong> {course.section}</p>
+                              
+                                {/* Add button at bottom-right */}
+                                <button className="mt-auto self-end bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow">
+                                  Add To Cart
+                                </button>
+                              </li>
                             ))}
                         </ul>
                     </>
