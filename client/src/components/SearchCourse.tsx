@@ -5,8 +5,20 @@ import { useState
 
 import { useEffect } from "react"
 
+
+interface Course {
+    id: number;
+    courseCode: string;
+    courseName: string;
+    examTime: string;
+    section: string;
+    classTime: string;
+    crn: string;
+}
+
 export function SearchCourse() {
     const [searchCode, setSearchCode] = useState(""); 
+    const [courses, setCourses] = useState<Course[] | null>(null);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchCode(event.target.value);
@@ -14,16 +26,7 @@ export function SearchCourse() {
     };
 
 
-    async function fetchCourses() {
-        fetch(`http://localhost:8080/api/courses/code/${searchCode}`).then((response) => {
-            if (!response.ok) {
-                console.log("Failed to fetch course code");
-            }
-            return response.json();
-        }).then((data) => {
-            
-        })
-    }
+    
 
     
 
