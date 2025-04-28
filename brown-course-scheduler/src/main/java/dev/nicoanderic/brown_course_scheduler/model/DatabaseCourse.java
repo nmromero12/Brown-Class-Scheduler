@@ -12,8 +12,6 @@ public class DatabaseCourse {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
-
-
   private String courseCode;
   private String courseName;
   private String examTime;
@@ -61,8 +59,6 @@ public class DatabaseCourse {
     this.crn = crn;
     this.id = id;
   }
-
-
   public void setCourseCode(String courseCode) {
     this.courseCode = courseCode;
   }

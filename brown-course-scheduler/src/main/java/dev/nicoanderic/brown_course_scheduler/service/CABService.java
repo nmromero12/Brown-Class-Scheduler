@@ -26,7 +26,6 @@ public class CABService {
   public CABService(ScraperService scraperService, RestTemplate restTemplate,
       CourseRepository courseRepository) {
     this.scraperService = scraperService;
-
     this.restTemplate = restTemplate;
     this.courseRepository = courseRepository;
   }
@@ -70,17 +69,8 @@ public class CABService {
       tempMap.put("exam time", courseLoad.getExam_html().replaceAll("<[^>]*>", "").replaceAll("&#160;", " "));
 
       responseMap.get("courses").add(tempMap);
-
-
     }
-
-
     return responseMap;
-
-
-
-
-
   }
 
   public List<DatabaseCourse> getCourseByCode(String coursecode) {

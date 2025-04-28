@@ -38,5 +38,4 @@ public class CourseController {
   public Object fetchCourseById(@PathVariable Integer id) {
     return cabService.getCoursebyid(id);
   }
-
 }
