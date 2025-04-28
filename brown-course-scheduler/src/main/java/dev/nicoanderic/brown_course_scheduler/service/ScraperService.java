@@ -29,7 +29,7 @@ public class ScraperService {
 
   @PostConstruct
   void postConstruct() {
-//    scrape();
+    scrape();
     System.out.println("done!");
     System.out.println(courses.size());
   }
@@ -53,17 +53,10 @@ public class ScraperService {
 
       for (String crnElement : crnList) {
         courses.add(new ScrapeCourse(cleanedCode, crnElement, semester));
-
-
       }
     }
-
-
-
-
   }
   public ArrayList<ScrapeCourse> getCourses () {
-
     return courses;
   }
 
