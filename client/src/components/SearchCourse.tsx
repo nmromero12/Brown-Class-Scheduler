@@ -21,6 +21,7 @@ export function SearchCourse() {
     const [courses, setCourses] = useState<Course[] | null>(null);
     const [resultMessage, setResultMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<String | null>(null);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchCode(event.target.value);
@@ -35,13 +36,15 @@ export function SearchCourse() {
             if (data.result == "success") {
                 setCourses(data.courses);
                 console.log(data.courses);
+                
             } else {
                 setCourses(null);
                 setResultMessage(data.message);
+                
             }
                 
-        } catch (error) {
-            console.error("fetch error:", error);
+        } catch (error: any) {
+            setError("Sorry, Connection to server failed");
         } finally {
             setIsLoading(false);
         }
@@ -49,40 +52,53 @@ export function SearchCourse() {
     }
    
     return (
-        <div>
-            <input
-            type="text"
-            value={searchCode}
-            onChange={handleInputChange}
-            placeholder="Enter Course Code"></input>
-            <button onClick={fetchCourses}>Submit</button>
+        <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-md mt-8">
+            <h1 className="text-2xl font-bold mb-4 text-center">Search Courses</h1>
+
+            <div className="mb-4">
+                <input
+                    type="text"
+                    value={searchCode}
+                    onChange={handleInputChange}
+                    placeholder="Enter Course Code"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
+
+            <div className="mb-6">
+                
+                <button
+                    onClick={fetchCourses}
+                    className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition"
+                    disabled={isLoading}
+                >
+                    {isLoading ? "Loading..." : "Submit"}
+                    {error && <p className="text-red-500 text-center">{error}</p>}
+                </button>
+            </div>
 
             <div>
                 {courses ? (
                     <>
-                        <h1>Courses Found</h1>
-                        <ul>
+                        <h2 className="text-xl font-semibold mb-4">Courses Found</h2>
+                        <ul className="space-y-4">
                             {courses.map((course) => (
-                                <li key={course.courseCode}>
-                                    <p>Course Name: {course.courseName}</p>
-                                    <p>Final Exam: {course.examTime}</p>
-                                    <p>Class Time: {course.classTime}</p>
-                                    <p>Section: {course.section}</p>
+                                <li
+                                    key={course.courseCode}
+                                    className="p-4 border border-gray-200 rounded-md shadow-sm bg-gray-50"
+                                >
+                                    <p><strong>Course Name:</strong> {course.courseName}</p>
+                                    <p><strong>Final Exam:</strong> {course.examTime}</p>
+                                    <p><strong>Class Time:</strong> {course.classTime}</p>
+                                    <p><strong>Section:</strong> {course.section}</p>
                                 </li>
                             ))}
                         </ul>
                     </>
-                    
-    
-                    
                 ) : (
-                    <p>{resultMessage}</p>
+                    resultMessage && <p className="text-red-500 text-center">{resultMessage}</p>
                 )}
             </div>
-            
         </div>
-        
-
-
-    )
+    );
 }

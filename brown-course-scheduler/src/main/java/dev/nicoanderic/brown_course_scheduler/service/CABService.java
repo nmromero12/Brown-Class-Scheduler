@@ -78,7 +78,7 @@ public class CABService {
     List<DatabaseCourse> courses = courseRepository.findByCourseCode(coursecode);
     if (courses.isEmpty()) {
       courseMap.put("result", "error");
-      courseMap.put("message", "no course found for that code");
+      courseMap.put("message", "Sorry, no course has been found for that course code");
     }
     else {
       courseMap.put("result", "success");
