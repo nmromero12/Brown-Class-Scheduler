@@ -6,7 +6,7 @@ import { useState
 import { useEffect } from "react"
 
 
-interface Course {
+export interface Course {
     id: number;
     courseCode: string;
     courseName: string;
@@ -52,6 +52,10 @@ export function SearchCourse() {
         }
 
     }
+
+    function addToCart () {
+
+    }
    
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-md mt-8">
@@ -94,7 +98,7 @@ export function SearchCourse() {
                                 <p><strong>Class Time:</strong> {course.classTime}</p>
                                 <p><strong>Section:</strong> {course.section}</p>
                               
-                                {/* Add button at bottom-right */}
+                                
                                 <button className="mt-auto self-end bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow">
                                   Add To Cart
                                 </button>
