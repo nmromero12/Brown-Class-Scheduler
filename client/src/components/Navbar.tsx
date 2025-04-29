@@ -1,4 +1,4 @@
-
+import { Link } from "react-router-dom"
 
 export default function Navbar() {
     return (
@@ -17,11 +17,11 @@ export default function Navbar() {
             {/* Links */}
             <ul className="flex space-x-6 text-gray-300 font-medium">
               <li>
-                <a href="#" className="px-3 py-1 bg-gray-800 rounded text-white">Dashboard</a>
+                <Link to="/" className="px-3 py-1 bg-gray-800 rounded text-white">Home</Link>
               </li>
-              <li><a href="#" className="hover:text-white">Team</a></li>
-              <li><a href="#" className="hover:text-white">Projects</a></li>
-              <li><a href="#" className="hover:text-white">Calendar</a></li>
+              <li><Link to="/search" className="hover:text-white">Search</Link></li>
+              <li><Link to="/calender" className="hover:text-white">Calender</Link></li>
+              
             </ul>
           </div>
   
