@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Course } from "./SearchCourse";
+import { CartProvider } from "./CartContext";
 
 export default function Cart() {
   const [showCart, setShowCart] = useState(true);
@@ -9,6 +10,7 @@ export default function Cart() {
 
   return (
     <div className="fixed top-20 right-6 z-50">
+        
       <button
         onClick={toggleCart}
         className="mb-2 bg-gray-800 text-white text-sm px-3 py-1 rounded hover:bg-gray-700"
@@ -32,6 +34,7 @@ export default function Cart() {
           </div>
         </div>
       )}
+      
     </div>
   );
 }

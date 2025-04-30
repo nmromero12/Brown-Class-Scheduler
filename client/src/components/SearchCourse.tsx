@@ -6,7 +6,7 @@ import { useState
 import { useEffect } from "react"
 
 
-export interface Course {
+export type Course = {
     id: number;
     courseCode: string;
     courseName: string;
