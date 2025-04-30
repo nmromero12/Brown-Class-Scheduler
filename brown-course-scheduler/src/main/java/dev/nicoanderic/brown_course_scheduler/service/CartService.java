@@ -31,7 +31,11 @@ public class CartService {
 
   public void addToCart(CartItem cartItem) {
     String userId = cartItem.getUserid();
-    if (cartItemRepository.findByUserId(userId) == null) {
+    Integer cartId = cartItem.getId();
+
+    CartItem existing = cartItemRepository.findByUserIdAndCartItemId(userId, cartId);
+
+    if (existing == null) {
       cartItemRepository.saveAndFlush(cartItem);
     }
   }
