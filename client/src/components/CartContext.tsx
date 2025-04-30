@@ -27,7 +27,9 @@ export function CartProvider({ children }:
     const [cartItems, setCartItems] = useState<Course[]>([]);
     function addToCart (c: Course) {
         if (!cartItems.find(course => course.id === c.id)) {
-            return setCartItems(courses => [...courses, c]);
+            setCartItems(courses => [...courses, c]);
+            console.log(cartItems);
+            
         }
     }
 
