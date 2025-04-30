@@ -30,10 +30,9 @@ public class CartService {
 
 
   public void addToCart(CartItem cartItem) {
-    String userId = cartItem.getUserid();
-    Integer cartId = cartItem.getId();
 
-    CartItem existing = cartItemRepository.findByUserIdAndCartItemId(userId, cartId);
+
+    CartItem existing = cartItemRepository.findByitemId(cartItem.getitemId());
 
     if (existing == null) {
       cartItemRepository.saveAndFlush(cartItem);

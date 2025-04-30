@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 public class CartItem {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  private int itemId;
   private String userId;
   private String courseCode;
   private String courseName;
@@ -21,12 +21,12 @@ public class CartItem {
   public CartItem() {}
 
 
-  public Integer getId() {
-    return id;
+  public Integer getitemId() {
+    return itemId;
   }
 
-  public void setId(Integer id) {
-    this.id = id;
+  public void setitemId(int id) {
+    this.itemId = id;
   }
 
   public String getUserid() {
