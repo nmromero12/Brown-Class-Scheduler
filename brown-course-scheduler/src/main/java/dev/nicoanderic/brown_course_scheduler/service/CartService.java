@@ -30,8 +30,6 @@ public class CartService {
 
 
   public void addToCart(CartItem cartItem) {
-
-
     CartItem existing = cartItemRepository.findByitemId(cartItem.getitemId());
 
     if (existing == null) {

@@ -7,11 +7,13 @@ import dev.nicoanderic.brown_course_scheduler.service.CartService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/cart")
 public class CartController {
   private final CartService cartService;
   private final CartItemRepository cartItemRepository;
@@ -21,13 +23,13 @@ public class CartController {
     this.cartItemRepository = cartItemRepository;
   }
 
-  @GetMapping("/userCart/{userId}")
+  @GetMapping("/user/{userId}")
   public Object getCartItem(@PathVariable String userId) {
     return cartService.getCartItems(userId);
   }
 
-  @GetMapping("/addToCart/{cartItem}")
-  public void addToCart(@PathVariable CartItem cartItem) {
+  @PostMapping("/addToCart")
+  public void addToCart(@RequestBody CartItem cartItem) {
     cartService.addToCart(cartItem);
   }
 
