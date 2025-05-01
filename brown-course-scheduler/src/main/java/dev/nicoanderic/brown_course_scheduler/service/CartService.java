@@ -20,9 +20,9 @@ public class CartService {
     Map<String, Object> result = new HashMap<>();
     List<CartItem> userItems = cartItemRepository.findByuserName(clerkUserId);
     if (userItems.isEmpty()) {
-      result.put("message", "No cart");
+      result.put("result", "No cart");
     } else {
-      result.put("message", "success");
+      result.put("result", "success");
       result.put("items", userItems);
     }
     return result;

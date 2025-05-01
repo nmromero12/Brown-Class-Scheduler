@@ -150,7 +150,7 @@ export function SearchCourse() {
                                     };
                                     addtoCartRepository(cartItem)
                                     console.log(cartItem.userName)
-                                    addToCart(course)}}}>
+                                    addToCart(cartItem)}}}>
                                   Add To Cart
                                 </button>
                               </li>

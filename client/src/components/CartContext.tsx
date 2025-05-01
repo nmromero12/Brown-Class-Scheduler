@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { Course } from "./SearchCourse";
+import { Course, CartItem } from "./SearchCourse";
 import { ReactNode, useContext } from "react";
 
 
@@ -8,9 +8,10 @@ type CartProviderProps = {
 }
 
 type CartContext = {
-    cartItems: Course[];
-    addToCart: (course: Course) => void;
-    removeFromCart: (course: Course) => void;
+    cartItems: CartItem[];
+    addToCart: (course: CartItem) => void;
+    removeFromCart: (course: CartItem) => void;
+    initializeCart: (courses: CartItem[]) => void;
 }
 
 const CartContext = createContext({} as CartContext)
@@ -24,22 +25,26 @@ export function CartProvider({ children }:
     
     CartProviderProps
 ) {
-    const [cartItems, setCartItems] = useState<Course[]>([]);
-    function addToCart (c: Course) {
-        if (!cartItems.find(course => course.id === c.id)) {
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+    function addToCart (c: CartItem) {
+        if (!cartItems.find(course => course.crn === c.crn)) {
             setCartItems(courses => [...courses, c]);
             console.log(cartItems);
             
         }
     }
 
-    function removeFromCart (course: Course) {
+    function removeFromCart (course: CartItem) {
         setCartItems(currItems => {
-            return currItems.filter(items => items.id !== course.id)
+            return currItems.filter(items => items.crn !== course.crn)
         })
     }
+
+    function initializeCart(items: CartItem[]) {
+        setCartItems(items);
+    }
     return (
-        <CartContext.Provider value={{cartItems, addToCart, removeFromCart}}>
+        <CartContext.Provider value={{cartItems, addToCart, removeFromCart, initializeCart}}>
             {children}
         </CartContext.Provider>
     )
