@@ -8,4 +8,5 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
   List<CartItem> findByuserName(String userName);
   CartItem findByitemId(int itemId);
   CartItem findByCrn(String crn);
+  void deleteByCrn(String crn);
 }

@@ -33,6 +33,20 @@ export default function Cart() {
     
   }
 
+  async function deleteFromCartRepository(crn: string) {
+    try {
+        const response = await fetch (`http://localhost:8080/cart/deleteItem/${crn}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        console.log("Item deleted successfull");
+    } catch (error: any) {
+        console.log(error)
+    }
+}
+
   return (
     <div className="fixed top-20 right-6 z-50">
         
@@ -56,7 +70,7 @@ export default function Cart() {
                      <p className="text-xs text-gray-500">Section: {course.section} | CRN: {course.crn}</p>
                      <p className="text-xs text-gray-500">Class: {course.classTime}</p>
                      <button
-                        onClick={() => removeFromCart(course)} // Call remove function when clicked
+                        onClick={() => {deleteFromCartRepository(course.crn), removeFromCart(course) }} // Call remove function when clicked
                         className="mt-2 bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500">
                         Remove from Cart
                     </button>
