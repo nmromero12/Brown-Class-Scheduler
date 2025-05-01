@@ -5,10 +5,21 @@ import { useState
 
 import { useEffect } from "react"
 import { useCart } from "./CartContext";
+import { useUser } from "@clerk/clerk-react";
 
 
 export type Course = {
     id: number;
+    courseCode: string;
+    courseName: string;
+    examTime: string;
+    section: string;
+    classTime: string;
+    crn: string;
+}
+
+export type CartItem = {
+    userName: string;
     courseCode: string;
     courseName: string;
     examTime: string;
@@ -24,6 +35,8 @@ export function SearchCourse() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<String | null>(null);
     const {addToCart,  cartItems} = useCart();
+    const { user } = useUser();
+
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchCode(event.target.value);
@@ -54,6 +67,30 @@ export function SearchCourse() {
         }
 
     }
+
+    async function addtoCartRepository(cartItem: CartItem) {
+        try  {
+            const response = await fetch('http://localhost:8080/cart/addToCart', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(cartItem)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to add item");
+                }
+                console.log("Item added successfully");
+                
+            })}
+                
+            catch(error: any) {
+                console.log(error)
+            }}
+    
+
+    
+    
 
     
 
@@ -101,7 +138,22 @@ export function SearchCourse() {
                                 <p><strong>Section:</strong> {course.section}</p>
                               
                                 
-                                <button className="mt-auto self-end bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow" onClick={() => addToCart(course)}>
+                                <button className="mt-auto self-end bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow" onClick={() => {
+                                    if (!user) {
+                                        alert("You need to be logged in first")
+                                    } else {
+                                    const cartItem: CartItem= {
+                                        userName: user.id,
+                                        courseCode: course.courseCode,
+                                        courseName: course.courseName,
+                                        examTime: course.examTime,
+                                        section: course.section,
+                                        classTime: course.classTime,
+                                        crn: course.crn
+                                    };
+                                    addtoCartRepository(cartItem)
+                                    console.log(cartItem.userName)
+                                    addToCart(cartItem)}}}>
                                   Add To Cart
                                 </button>
                               </li>
