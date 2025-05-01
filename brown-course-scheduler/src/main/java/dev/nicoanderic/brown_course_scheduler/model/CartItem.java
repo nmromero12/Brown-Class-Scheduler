@@ -10,7 +10,7 @@ public class CartItem {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int itemId;
-  private String userId;
+  private String userName;
   private String courseCode;
   private String courseName;
   private String examTime;
@@ -21,7 +21,7 @@ public class CartItem {
   public CartItem() {}
 
 
-  public Integer getitemId() {
+  public int getitemId() {
     return itemId;
   }
 
@@ -29,12 +29,12 @@ public class CartItem {
     this.itemId = id;
   }
 
-  public String getUserid() {
-    return userId;
+  public String getUserName() {
+    return userName;
   }
 
-  public void setUserid(String userid) {
-    this.userId = userid;
+  public void setUserName(String userName) {
+    this.userName = userName;
   }
 
   public String getCourseCode() {

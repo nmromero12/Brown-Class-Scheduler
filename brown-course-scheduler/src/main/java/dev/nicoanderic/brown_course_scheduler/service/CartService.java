@@ -18,7 +18,7 @@ public class CartService {
 
   public Object getCartItems(String clerkUserId) {
     Map<String, Object> result = new HashMap<>();
-    List<CartItem> userItems = cartItemRepository.findByUserId(clerkUserId);
+    List<CartItem> userItems = cartItemRepository.findByuserName(clerkUserId);
     if (userItems.isEmpty()) {
       result.put("message", "No cart");
     } else {
@@ -30,10 +30,14 @@ public class CartService {
 
 
   public void addToCart(CartItem cartItem) {
-    CartItem existing = cartItemRepository.findByitemId(cartItem.getitemId());
+
+    try {
+    CartItem existing = cartItemRepository.findByCrn(cartItem.getCrn());
 
     if (existing == null) {
       cartItemRepository.saveAndFlush(cartItem);
+    }} catch (Exception e) {
+      System.out.println("Already added to cart");
     }
   }
 
