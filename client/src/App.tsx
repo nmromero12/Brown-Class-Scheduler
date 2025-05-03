@@ -21,8 +21,7 @@ function App() {
     </CartProvider>
     <SignOutButton/>
     </SignedIn>
-    
-
+  
   </>
   )
 }

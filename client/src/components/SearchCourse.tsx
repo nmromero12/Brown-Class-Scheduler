@@ -1,12 +1,7 @@
-import { useState
- } from "react"
-
- import { ChangeEvent } from "react";
-
-import { useEffect } from "react"
+import { useState} from "react"
+import { ChangeEvent } from "react";
 import { useCart } from "./CartContext";
 import { useUser } from "@clerk/clerk-react";
-
 
 export type Course = {
     id: number;
@@ -57,15 +52,12 @@ export function SearchCourse() {
             } else {
                 setCourses(null);
                 setResultMessage(data.message);
-                
             }
-                
         } catch (error: any) {
             setError("Sorry, Connection to server failed");
         } finally {
             setIsLoading(false);
         }
-
     }
 
     async function addtoCartRepository(cartItem: CartItem) {
@@ -87,19 +79,9 @@ export function SearchCourse() {
             catch(error: any) {
                 console.log(error)
             }}
-    
-
-    
-    
-
-    
-
-    
-   
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-md mt-8">
             <h1 className="text-2xl font-bold mb-4 text-center">Search Courses</h1>
-
             <div className="mb-4">
                 <input
                     type="text"
@@ -109,9 +91,7 @@ export function SearchCourse() {
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
-
             <div className="mb-6">
-                
                 <button
                     onClick={fetchCourses}
                     className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition"
@@ -121,7 +101,6 @@ export function SearchCourse() {
                     {error && <p className="text-red-500 text-center">{error}</p>}
                 </button>
             </div>
-
             <div>
                 {courses ? (
                     <>
