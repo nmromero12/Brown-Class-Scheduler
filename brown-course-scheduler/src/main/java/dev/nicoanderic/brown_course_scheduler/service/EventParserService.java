@@ -20,8 +20,17 @@ public class EventParserService {
     recurrenceMap.put("T", "TU");
     recurrenceMap.put("Th", "TH");
     recurrenceMap.put("F", "FR");
+    recurrenceMap.put("S", "SA");
+    HashMap<String, DayOfWeek> days = new HashMap<>();
+    days.put("M", DayOfWeek.MONDAY);
+    days.put("T", DayOfWeek.TUESDAY);
+    days.put("W", DayOfWeek.WEDNESDAY);
+    days.put("TH", DayOfWeek.THURSDAY);
+    days.put("F", DayOfWeek.FRIDAY);
+    days.put("S", DayOfWeek.SATURDAY);
     String recurrenceRelation = "RRULE:FREQ=WEEKLY;BYDAY=";
     String timeLocation = eventRequest.getParseTime();
+    String startDay = timeLocation.charAt(0) + "";
     String[] timeLocationSplit = timeLocation.split(" ");
     String dayString = timeLocationSplit[0];
     String timeString = timeLocationSplit[1];
@@ -31,6 +40,13 @@ public class EventParserService {
 
     LocalDate localDate = LocalDate.now();
     DayOfWeek dayOfWeek = localDate.getDayOfWeek();
+
+    while (!days.get(startDay).equals(dayOfWeek)) {
+      localDate = localDate.plusDays(1);
+      dayOfWeek = localDate.getDayOfWeek();
+    }
+
+
     DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
         .parseCaseInsensitive() // Handle "PM" or "pm"
         .appendPattern("h[:mm]a") // Primary pattern for "2pm" or "2:50pm"
