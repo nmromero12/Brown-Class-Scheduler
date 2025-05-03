@@ -11,6 +11,7 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import dev.nicoanderic.brown_course_scheduler.model.EventRequest;
+import dev.nicoanderic.brown_course_scheduler.service.EventParserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +25,7 @@ import java.time.format.DateTimeFormatter;
 @RestController
 @RequestMapping("/api/calendar")
 public class CalendarController {
+  EventParserService eventParserService;
 
   @Value("${clerk.secretKey}")
   private String clerkSecretKey; // Store Clerk Secret Key in application.properties
@@ -31,6 +33,7 @@ public class CalendarController {
   @PostMapping("/add-event")
   public String addEvent(@RequestHeader("Authorization") String clerkToken, @RequestBody EventRequest eventRequest) throws Exception {
     // Extract user ID from the request
+    EventRequest formattedEventRequest = eventParserService.parse(eventRequest);
     String userId = eventRequest.getUserId();
     if (userId == null || userId.isEmpty()) {
       throw new Exception("User ID is required");
@@ -72,17 +75,18 @@ public class CalendarController {
         .build();
 
     Event event = new Event()
-        .setSummary(eventRequest.getSummary())
-        .setDescription(eventRequest.getDescription());
+        .setSummary(formattedEventRequest.getSummary())
+        .setDescription(formattedEventRequest.getDescription());
 
     DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
     EventDateTime start = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(
-        ZonedDateTime.parse(eventRequest.getStartTime(), formatter).toInstant().toEpochMilli()));
+        ZonedDateTime.parse(formattedEventRequest.getStartTime(), formatter).toInstant().toEpochMilli())).setTimeZone("America/New_York");
     EventDateTime end = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(
-        ZonedDateTime.parse(eventRequest.getEndTime(), formatter).toInstant().toEpochMilli()));
+        ZonedDateTime.parse(formattedEventRequest.getEndTime(), formatter).toInstant().toEpochMilli())).setTimeZone("America/New_York");
 
     event.setStart(start);
     event.setEnd(end);
+
 
     Event createdEvent = service.events().insert("primary", event).execute();
     return "Event created: " + createdEvent.getHtmlLink();
