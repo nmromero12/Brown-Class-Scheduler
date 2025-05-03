@@ -5,6 +5,7 @@ import {Routes, Route} from "react-router-dom"
 import Cart from './components/Cart.tsx'
 import { CartProvider } from './components/CartContext.tsx' 
 import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton} from "@clerk/clerk-react";
+
 function App() {
 
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/calender"></Route>
     </Routes>
     <Cart/>
+
     </CartProvider>
     <SignOutButton/>
     </SignedIn>
