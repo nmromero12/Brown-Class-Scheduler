@@ -12,6 +12,8 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
 import dev.nicoanderic.brown_course_scheduler.model.EventRequest;
 import dev.nicoanderic.brown_course_scheduler.service.EventParserService;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +27,7 @@ import java.time.format.DateTimeFormatter;
 @RestController
 @RequestMapping("/api/calendar")
 public class CalendarController {
-  EventParserService eventParserService;
+  EventParserService eventParserService = new EventParserService();
 
   @Value("${clerk.secretKey}")
   private String clerkSecretKey; // Store Clerk Secret Key in application.properties
@@ -86,6 +88,8 @@ public class CalendarController {
 
     event.setStart(start);
     event.setEnd(end);
+    List<String> recurrence = Arrays.asList(formattedEventRequest.getRecurrenceRule());
+    event.setRecurrence(recurrence);
 
 
     Event createdEvent = service.events().insert("primary", event).execute();

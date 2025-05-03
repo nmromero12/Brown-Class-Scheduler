@@ -1,11 +1,25 @@
 import { useState, useEffect } from "react";
 import { useCart } from "./CartContext";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useAuth } from "@clerk/clerk-react";
 
 export default function Cart() {
   const [showCart, setShowCart] = useState(true);
   const { cartItems, removeFromCart, initializeCart } = useCart();
   const { user } = useUser();
+  const { getToken } = useAuth();
+  
+
+  type EventRequest = {
+    summary: string;
+    description: string;
+    parseTime: string;
+    recurrenceRule: string;
+    startTime: string;
+    endTime: string;
+    userId: string;
+
+  }
+  
 
   const toggleCart = () => setShowCart((prev) => !prev);
 
@@ -41,6 +55,44 @@ export default function Cart() {
       console.log(error);
     }
   }
+
+  const handleAddEvent = async (course: any) => {
+    if (!user) {
+      console.log("Please sign in");
+      return;
+    }
+  
+    try {
+      const clerkToken = await getToken();
+
+      const eventRequest: EventRequest = {
+        summary: course.courseName,
+        description: course.courseName,
+        parseTime: course.classTime,
+        recurrenceRule: "",
+        startTime: "",
+        endTime: "",
+        userId: user.id
+      }
+  
+      const response = await fetch('http://localhost:8080/api/calendar/add-event', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${clerkToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          eventRequest
+          ),
+      });
+  
+      if (!response.ok) throw new Error('Failed to add event');
+  
+      console.log(response)
+    } catch (err) {
+      console.error('Error adding event:', err);
+    }
+  };
 
   return (
     <div className="fixed top-20 right-6 z-50">
@@ -78,7 +130,7 @@ export default function Cart() {
                     </button>
                     <button
                       onClick={() => {
-                        /* Add to GCAL logic will go here */
+                        handleAddEvent(course);
                       }}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >

@@ -1,6 +1,7 @@
 package dev.nicoanderic.brown_course_scheduler.service;
 
 import dev.nicoanderic.brown_course_scheduler.model.EventRequest;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -13,8 +14,13 @@ public class EventParserService {
 
 
   public EventRequest parse(EventRequest eventRequest) {
+    HashMap<String, String> recurrenceMap = new HashMap<>();
+    recurrenceMap.put("M", "MO");
+    recurrenceMap.put("W", "WE");
+    recurrenceMap.put("T", "TU");
+    recurrenceMap.put("Th", "TH");
+    recurrenceMap.put("F", "FR");
     String recurrenceRelation = "RRULE:FREQ=WEEKLY;BYDAY=";
-    String timeZone = "-5:00";
     String timeLocation = eventRequest.getParseTime();
     String[] timeLocationSplit = timeLocation.split(" ");
     String dayString = timeLocationSplit[0];
@@ -24,6 +30,7 @@ public class EventParserService {
     String endTime = timeSplit[1];
 
     LocalDate localDate = LocalDate.now();
+    DayOfWeek dayOfWeek = localDate.getDayOfWeek();
     DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
         .parseCaseInsensitive() // Handle "PM" or "pm"
         .appendPattern("h[:mm]a") // Primary pattern for "2pm" or "2:50pm"
@@ -32,7 +39,7 @@ public class EventParserService {
     LocalTime startLocalTime = LocalTime.parse(startTime.toLowerCase(), timeFormatter);
     LocalTime endLocalTime = LocalTime.parse(endTime.toLowerCase(), timeFormatter);
 
-    ZoneId zoneId = ZoneId.of(timeZone);
+    ZoneId zoneId = ZoneId.of("America/New_York");
     ZonedDateTime startZonedDateTime = ZonedDateTime.of(localDate, startLocalTime, zoneId);
     ZonedDateTime endZonedDateTime = ZonedDateTime.of(localDate, endLocalTime, zoneId);
 
@@ -40,27 +47,22 @@ public class EventParserService {
     String formattedStartTime = startZonedDateTime.format(isoFormatter); // e.g., "2025-05-02T14:00:00-05:00"
     String formattedEndTime = endZonedDateTime.format(isoFormatter);
 
-    HashMap<String, String> map = new HashMap<>();
-    map.put("M", "MO");
-    map.put("W", "WE");
-    map.put("T", "TU");
-    map.put("Th", "TH");
-    map.put("F", "FR");
+
 
     if (dayString.contains("M")) {
-      recurrenceRelation += map.get("M") + ",";
+      recurrenceRelation += recurrenceMap.get("M") + ",";
     }
     if (dayString.contains("W")) {
-      recurrenceRelation += map.get("W") + ",";
+      recurrenceRelation += recurrenceMap.get("W") + ",";
     }
     if (dayString.contains("T")) {
-      recurrenceRelation += map.get("T") + ",";
+      recurrenceRelation += recurrenceMap.get("T") + ",";
     }
     if (dayString.contains("Th")) {
-      recurrenceRelation += map.get("Th") + ",";
+      recurrenceRelation += recurrenceMap.get("Th") + ",";
     }
     if (dayString.contains("F")) {
-      recurrenceRelation += map.get("F") + ",";
+      recurrenceRelation += recurrenceMap.get("F") + ",";
     }
 
     // Remove trailing comma
