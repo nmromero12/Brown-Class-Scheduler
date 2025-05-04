@@ -13,6 +13,7 @@ export default function Navbar() {
               <path d="M10 2a8 8 0 100 16 8 8 0 000-16z" />
             </svg>
             <span className="text-lg font-semibold">MyApp</span>
+
           </div>
 
           {/* Links */}
