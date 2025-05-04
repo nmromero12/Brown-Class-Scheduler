@@ -1,3 +1,4 @@
+import { UserButton } from "@clerk/clerk-react";
 import { Link } from "react-router-dom"
 
 export default function Navbar() {
@@ -34,12 +35,7 @@ export default function Navbar() {
               </svg>
             </button>
   
-            {/* Profile Avatar (placeholder) */}
-            <img
-              src="https://i.pravatar.cc/40?img=1"
-              alt="User"
-              className="w-9 h-9 rounded-full border-2 border-white"
-            />
+            <UserButton/>
           </div>
         </div>
       </nav>
