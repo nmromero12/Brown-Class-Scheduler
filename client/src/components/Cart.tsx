@@ -7,7 +7,6 @@ export default function Cart() {
   const { cartItems, removeFromCart, initializeCart } = useCart();
   const { user } = useUser();
   const { getToken } = useAuth();
-  
 
   type EventRequest = {
     summary: string;
@@ -17,10 +16,7 @@ export default function Cart() {
     startTime: string;
     endTime: string;
     userId: string;
-
-  }
-  
-
+  };
   const toggleCart = () => setShowCart((prev) => !prev);
 
   useEffect(() => {
@@ -30,7 +26,9 @@ export default function Cart() {
   async function populateCart() {
     if (user) {
       try {
-        const response = await fetch(`http://localhost:8080/cart/user/${user.id}`);
+        const response = await fetch(
+          `http://localhost:8080/cart/user/${user.id}`
+        );
         const data = await response.json();
         if (data.result === "success") {
           console.log("hello");
@@ -61,7 +59,7 @@ export default function Cart() {
       console.log("Please sign in");
       return;
     }
-  
+
     try {
       const clerkToken = await getToken();
 
@@ -72,41 +70,44 @@ export default function Cart() {
         recurrenceRule: "",
         startTime: "",
         endTime: "",
-        userId: user.id
-      }
-  
-      const response = await fetch('http://localhost:8080/api/calendar/add-event', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${clerkToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-          eventRequest
-          ),
-      });
-  
-      if (!response.ok) throw new Error('Failed to add event');
-  
-      console.log(response)
+        userId: user.id,
+      };
+
+      const response = await fetch(
+        "http://localhost:8080/api/calendar/add-event",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${clerkToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventRequest),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to add event");
+
+      console.log(response);
     } catch (err) {
-      console.error('Error adding event:', err);
+      console.error("Error adding event:", err);
     }
   };
 
   return (
-    <div className="fixed top-20 right-6 z-50">
+    <div className="relative z-50">
       <button
         onClick={toggleCart}
-        className="mb-2 bg-gray-800 text-white text-sm px-3 py-1 rounded hover:bg-gray-700"
+        className="bg-gray-800 text-white text-sm px-3 py-1 rounded hover:bg-gray-700"
       >
         {showCart ? "Hide Cart" : "Show Cart"}
       </button>
-
+  
       {showCart && (
-        <div className="w-96 bg-white shadow-xl rounded-lg p-6">
-          <h2 className="text-lg font-bold mb-4 text-gray-800 text-center">Your Course Schedule</h2>
-
+        <div className="mt-2 w-96 bg-white shadow-xl rounded-lg p-6">
+          <h2 className="text-lg font-bold mb-4 text-gray-800 text-center">
+            Your Course Schedule
+          </h2>
+  
           {cartItems.length > 0 ? (
             <ul className="space-y-3 max-h-64 overflow-y-auto">
               {cartItems.map((course) => (
@@ -117,7 +118,9 @@ export default function Cart() {
                   <p className="text-xs text-gray-500">
                     Section: {course.section} | CRN: {course.crn}
                   </p>
-                  <p className="text-xs text-gray-500">Class: {course.classTime}</p>
+                  <p className="text-xs text-gray-500">
+                    Class: {course.classTime}
+                  </p>
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={() => {
@@ -141,12 +144,15 @@ export default function Cart() {
               ))}
             </ul>
           ) : (
-            <p className="text-center text-gray-500">No items added to the cart</p>
+            <p className="text-center text-gray-500">
+              No items added to the cart
+            </p>
           )}
-
+  
           <div className="mt-4 border-t pt-3"></div>
         </div>
       )}
     </div>
   );
+  
 }
