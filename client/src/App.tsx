@@ -16,10 +16,8 @@ function App() {
       <Route path="/calender"></Route>
     </Routes>
     <Cart/>
-    </CartProvider>
-  
+  </CartProvider>
   </>
   )
 }
-
 export default App
