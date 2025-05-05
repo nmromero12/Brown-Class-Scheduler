@@ -68,6 +68,10 @@ export default function Navbar() {
 
         {/* Right: Icons */}
         <div className="flex items-center space-x-4">
+          <div className="mr-5">
+            <Cart></Cart>
+          </div>
+
           {/* User Button (conditionally rendered) */}
           <SignedIn>
             <UserButton />

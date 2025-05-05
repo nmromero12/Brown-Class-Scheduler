@@ -8,13 +8,12 @@ import { CartProvider } from "./components/CartContext.tsx";
 function App() {
   return (
     <>
-      <Navbar />
       <CartProvider>
+        <Navbar/>
         <Routes>
           <Route path="/search" element={<SearchCourse />}></Route>
           <Route path="/calender"></Route>
         </Routes>
-        <Cart></Cart>
       </CartProvider>
     </>
   );
