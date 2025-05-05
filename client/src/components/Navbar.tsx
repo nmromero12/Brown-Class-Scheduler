@@ -24,48 +24,9 @@ export default function Navbar() {
               Brown Course Scheduler
             </span>
           </div>
-
-          {/* Links */}
-          <ul className="flex space-x-6 text-gray-300 font-medium">
-            <li>
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg hover:text-white hover:bg-gray-700 transition-colors duration-300 ${
-                    isActive ? "bg-gray-700 text-white" : ""
-                  }`
-                }
-              >
-                Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/search"
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg hover:text-white hover:bg-gray-700 transition-colors duration-300 ${
-                    isActive ? "bg-gray-700 text-white" : ""
-                  }`
-                }
-              >
-                Search
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/calender"
-                className={({ isActive }) =>
-                  `px-4 py-2 rounded-lg hover:text-white hover:bg-gray-700 transition-colors duration-300 ${
-                    isActive ? "bg-gray-700 text-white" : ""
-                  }`
-                }
-              >
-                Calendar
-              </NavLink>
-            </li>
-          </ul>
         </div>
 
+        
         {/* Right: Icons */}
         <div className="flex items-center space-x-4">
           <div className="mr-5">
