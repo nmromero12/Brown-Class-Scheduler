@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "./CartContext";
 import { useUser, useAuth } from "@clerk/clerk-react";
 
 export default function Cart() {
-  const [showCart, setShowCart] = useState(true);
+  const [showCart, setShowCart] = useState(false);
   const { cartItems, removeFromCart, initializeCart } = useCart();
   const { user } = useUser();
   const { getToken } = useAuth();
-  
+
+  const cartRef = useRef<HTMLDivElement | null>(null);
+  const cartIconRef = useRef<HTMLImageElement | null>(null);
 
   type EventRequest = {
     summary: string;
@@ -17,9 +19,7 @@ export default function Cart() {
     startTime: string;
     endTime: string;
     userId: string;
-
-  }
-  
+  };
 
   const toggleCart = () => setShowCart((prev) => !prev);
 
@@ -30,10 +30,11 @@ export default function Cart() {
   async function populateCart() {
     if (user) {
       try {
-        const response = await fetch(`http://localhost:8080/cart/user/${user.id}`);
+        const response = await fetch(
+          `http://localhost:8080/cart/user/${user.id}`
+        );
         const data = await response.json();
         if (data.result === "success") {
-          console.log("hello");
           initializeCart(data.items);
         }
       } catch (error: any) {
@@ -61,7 +62,7 @@ export default function Cart() {
       console.log("Please sign in");
       return;
     }
-  
+
     try {
       const clerkToken = await getToken();
 
@@ -72,41 +73,53 @@ export default function Cart() {
         recurrenceRule: "",
         startTime: "",
         endTime: "",
-        userId: user.id
-      }
-  
-      const response = await fetch('http://localhost:8080/api/calendar/add-event', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${clerkToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(
-          eventRequest
-          ),
-      });
-  
-      if (!response.ok) throw new Error('Failed to add event');
-  
-      console.log(response)
+        userId: user.id,
+      };
+
+      const response = await fetch(
+        "http://localhost:8080/api/calendar/add-event",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${clerkToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventRequest),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to add event");
+
+      console.log(response);
     } catch (err) {
-      console.error('Error adding event:', err);
+      console.error("Error adding event:", err);
     }
   };
 
   return (
-    <div className="fixed top-20 right-6 z-50">
-      <button
+    <div className="relative">
+      <img
+        ref={cartIconRef}
+        src="src/components/assets/shopping-cart.png" // replace with your image path
+        alt="Cart Icon"
         onClick={toggleCart}
-        className="mb-2 bg-gray-800 text-white text-sm px-3 py-1 rounded hover:bg-gray-700"
-      >
-        {showCart ? "Hide Cart" : "Show Cart"}
-      </button>
-
+        className="cursor-pointer" // Adds a cursor pointer for better user interaction
+        style={{ width: "30px", height: "30px" }} // You can adjust the size of the icon here
+      />
       {showCart && (
-        <div className="w-96 bg-white shadow-xl rounded-lg p-6">
-          <h2 className="text-lg font-bold mb-4 text-gray-800 text-center">Your Course Schedule</h2>
-
+        <div
+          ref={cartRef}
+          className="absolute right-2 mt-2 w-96 bg-white shadow-xl rounded-lg p-6 z-50"
+          style={{
+            top: cartIconRef.current ? cartIconRef.current.offsetTop + 40 : 0, // Attach the cart menu to the icon
+            right: "2px", // Adjust the position slightly to the left from the right edge
+            maxHeight: "calc(100vh - 64px)", // Prevent the cart from being too large and overflowing
+            overflowY: "auto", // Make the cart scrollable
+          }}
+        >
+          <h2 className="text-lg font-bold mb-4 text-gray-800 text-center">
+            Your Course Schedule
+          </h2>
           {cartItems.length > 0 ? (
             <ul className="space-y-3 max-h-64 overflow-y-auto">
               {cartItems.map((course) => (
@@ -117,7 +130,9 @@ export default function Cart() {
                   <p className="text-xs text-gray-500">
                     Section: {course.section} | CRN: {course.crn}
                   </p>
-                  <p className="text-xs text-gray-500">Class: {course.classTime}</p>
+                  <p className="text-xs text-gray-500">
+                    Class: {course.classTime}
+                  </p>
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={() => {
@@ -126,7 +141,7 @@ export default function Cart() {
                       }}
                       className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
                     >
-                      Remove from Cart
+                      Remove
                     </button>
                     <button
                       onClick={() => {
@@ -141,10 +156,10 @@ export default function Cart() {
               ))}
             </ul>
           ) : (
-            <p className="text-center text-gray-500">No items added to the cart</p>
+            <p className="text-center text-gray-500">
+              No items added to the cart
+            </p>
           )}
-
-          <div className="mt-4 border-t pt-3"></div>
         </div>
       )}
     </div>
