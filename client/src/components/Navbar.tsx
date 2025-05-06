@@ -7,11 +7,28 @@ export default function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
   
   useEffect(() => {
-    const handleGoogleSignIn = () => setSignedIn(true);
+    // Check for existing session on mount
+    const storedProfile = localStorage.getItem('googleUserProfile');
+    if (storedProfile) {
+      const profile = JSON.parse(storedProfile);
+      setSignedIn(true);
+      setProfilePicture(profile.picture);
+    }
+
+    const handleGoogleSignIn = () => {
+      setSignedIn(true);
+      const storedProfile = localStorage.getItem('googleUserProfile');
+      if (storedProfile) {
+        const profile = JSON.parse(storedProfile);
+        setProfilePicture(profile.picture);
+      }
+    };
+
     const handleGoogleSignOut = () => {
       setSignedIn(false);
       setProfilePicture(null);
     };
+
     const handleProfileLoaded = (event: CustomEvent) => {
       setProfilePicture(event.detail.picture);
     };

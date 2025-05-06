@@ -68,7 +68,9 @@ export default function Calendar() {
     };
 
     const handleGoogleSignInEvent = () => {
-      handleGoogleSignIn();
+      if (!accessToken) {  // Only trigger sign in if we don't have a token
+        handleGoogleSignIn();
+      }
     };
 
     const handleSignOut = () => {
@@ -100,9 +102,12 @@ export default function Calendar() {
       });
       if (!response.ok) throw new Error('Failed to fetch user profile');
       const data = await response.json();
+      console.log('Fetched user profile:', data);
       setUserProfile(data);
       localStorage.setItem('googleUserProfile', JSON.stringify(data));
-      window.dispatchEvent(new CustomEvent('googleProfileLoaded', { detail: data }));
+      const event = new CustomEvent('googleProfileLoaded', { detail: data });
+      console.log('Dispatching profile event:', event);
+      window.dispatchEvent(event);
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
@@ -170,6 +175,9 @@ export default function Calendar() {
               // If no existing calendar found, create a new one
               await createPublicCalendar(response.access_token);
             }
+            
+            // Dispatch sign in event after everything is set up
+            window.dispatchEvent(new Event('googleSignIn'));
           }
         },
       });
@@ -238,7 +246,7 @@ export default function Calendar() {
   }
 
   return (
-    <div className="w-full h-screen sticky top-0">
+    <div className="w-full shadow-md h-[94vh] sticky top-0">
       {calendarId ? (
         <iframe
           title="User Calendar"
@@ -248,7 +256,7 @@ export default function Calendar() {
           style={{ 
             border: "solid 1px #777", 
             width: "100%", 
-            height: "100vh",
+            height: "94vh",
             position: "sticky",
             top: 0
           }}

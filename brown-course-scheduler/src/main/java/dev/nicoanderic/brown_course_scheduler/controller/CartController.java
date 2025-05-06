@@ -5,13 +5,7 @@ import dev.nicoanderic.brown_course_scheduler.model.CartItem;
 import dev.nicoanderic.brown_course_scheduler.repository.CartItemRepository;
 import dev.nicoanderic.brown_course_scheduler.service.CartService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/cart")
@@ -34,10 +28,9 @@ public class CartController {
     cartService.addToCart(cartItem);
   }
 
-  @DeleteMapping("/deleteItem/{crn}")
-
-  public void deleteItem(@PathVariable String crn) {
-    cartService.deleteFromCart(crn);
+  @DeleteMapping("/deleteItem")
+  public void deleteItem(@RequestParam String crn, @RequestParam String username) {
+    cartService.deleteFromCart(crn, username);
   }
 
 

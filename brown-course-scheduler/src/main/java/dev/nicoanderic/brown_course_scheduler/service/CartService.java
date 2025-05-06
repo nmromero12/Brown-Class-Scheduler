@@ -35,7 +35,7 @@ public class CartService {
   public void addToCart(CartItem cartItem) {
 
     try {
-    CartItem existing = cartItemRepository.findByCrn(cartItem.getCrn());
+      CartItem existing = cartItemRepository.findByUserNameAndCrn(cartItem.getUserName(), cartItem.getCrn());
 
     if (existing == null) {
       cartItemRepository.saveAndFlush(cartItem);
@@ -44,8 +44,9 @@ public class CartService {
     }
   }
   @Transactional
-  public void deleteFromCart(String crn) {
-    cartItemRepository.deleteByCrn(crn);
+  public void deleteFromCart(String crn, String username) {
+    cartItemRepository.deleteByCrnAndUserName(crn, username);
+    cartItemRepository.flush();
   }
 
 }

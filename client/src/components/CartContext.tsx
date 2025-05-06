@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useCallback } from "react";
 import { Course, CartItem } from "./SearchCourse";
 import { ReactNode, useContext } from "react";
 
@@ -6,14 +6,14 @@ type CartProviderProps = {
   children: ReactNode;
 };
 
-type CartContext = {
+type CartContextItems = {
   cartItems: CartItem[];
-  addToCart: (course: CartItem) => void;
-  removeFromCart: (course: CartItem) => void;
+  addToCart: (course: CartItem) => Promise<void>;
+  removeFromCart: (course: CartItem) => Promise<void>;
   initializeCart: (courses: CartItem[]) => void;
 };
 
-const CartContext = createContext({} as CartContext);
+const CartContext = createContext({} as CartContextItems);
 
 export function useCart() {
   return useContext(CartContext);
@@ -21,22 +21,23 @@ export function useCart() {
 
 export function CartProvider({ children }: CartProviderProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  function addToCart(c: CartItem) {
+
+  const addToCart = useCallback(async (c: CartItem) => {
     if (!cartItems.find((course) => course.crn === c.crn)) {
       setCartItems((courses) => [...courses, c]);
-      console.log(cartItems);
     }
-  }
+  }, [cartItems]);
 
-  function removeFromCart(course: CartItem) {
+  const removeFromCart = useCallback(async (course: CartItem) => {
     setCartItems((currItems) => {
       return currItems.filter((items) => items.crn !== course.crn);
     });
-  }
+  }, []);
 
-  function initializeCart(items: CartItem[]) {
+  const initializeCart = useCallback((items: CartItem[]) => {
     setCartItems(items);
-  }
+  }, []);
+
   return (
     <CartContext.Provider
       value={{ cartItems, addToCart, removeFromCart, initializeCart }}
