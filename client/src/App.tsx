@@ -9,9 +9,15 @@ function App() {
   return (
     <>
       <CartProvider>
-        <Navbar/>
-        <SearchCourse></SearchCourse>
-        <Calendar></Calendar>
+        <Navbar />
+        <div className="flex w-full">
+          <div className="w-2/5">
+            <SearchCourse></SearchCourse>
+          </div>
+          <div className="w-3/5">
+            <Calendar></Calendar>
+          </div>
+        </div>
         <Routes>
           <Route path="/calender"></Route>
         </Routes>
