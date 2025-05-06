@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "./CartContext";
+import CalendarAddEvent from "./CalendarAddEvent";
 
 export default function Cart() {
   const [showCart, setShowCart] = useState(false);
@@ -147,6 +148,7 @@ export default function Cart() {
         endTime: "",
         userId: userId,
       };
+      console.log(eventRequest);
 
       const response = await fetch(
         "http://localhost:8080/api/calendar/add-event",
@@ -163,6 +165,8 @@ export default function Cart() {
       if (!response.ok) throw new Error("Failed to add event");
 
       console.log(response);
+      // Dispatch event to refresh calendar
+      window.dispatchEvent(new Event('calendarRefresh'));
     } catch (err) {
       console.error("Error adding event:", err);
     }

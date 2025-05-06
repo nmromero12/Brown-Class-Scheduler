@@ -83,15 +83,27 @@ export default function Calendar() {
       window.dispatchEvent(new Event('googleSignOut'));
     };
 
+    const handleCalendarRefresh = () => {
+      // Force iframe refresh by updating the src with a timestamp
+      const iframe = document.querySelector('iframe');
+      if (iframe && calendarId) {
+        const currentSrc = iframe.src;
+        const separator = currentSrc.includes('?') ? '&' : '?';
+        iframe.src = `${currentSrc}${separator}t=${Date.now()}`;
+      }
+    };
+
     loadGoogleIdentityServices();
     window.addEventListener('googleSignIn', handleGoogleSignInEvent);
     window.addEventListener('googleSignOut', handleSignOut);
+    window.addEventListener('calendarRefresh', handleCalendarRefresh);
 
     return () => {
       window.removeEventListener('googleSignIn', handleGoogleSignInEvent);
       window.removeEventListener('googleSignOut', handleSignOut);
+      window.removeEventListener('calendarRefresh', handleCalendarRefresh);
     };
-  }, [isGoogleScriptLoaded, accessToken]);
+  }, [isGoogleScriptLoaded, accessToken, calendarId]);
 
   const fetchUserProfile = async (token: string) => {
     try {
