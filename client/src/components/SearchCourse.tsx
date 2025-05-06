@@ -1,7 +1,6 @@
-import { useState} from "react"
+import { useState, useEffect } from "react"
 import { ChangeEvent } from "react";
 import { useCart } from "./CartContext";
-import { useUser } from "@clerk/clerk-react";
 
 export type Course = {
     id: number;
@@ -29,14 +28,31 @@ export function SearchCourse() {
     const [resultMessage, setResultMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<String | null>(null);
-    const {addToCart,  cartItems} = useCart();
-    const { user } = useUser();
+    const {addToCart, cartItems} = useCart();
+    const [userProfile, setUserProfile] = useState<{ id?: string, email?: string } | null>(null);
 
+    useEffect(() => {
+        const storedProfile = localStorage.getItem('googleUserProfile');
+        if (storedProfile) {
+            setUserProfile(JSON.parse(storedProfile));
+        }
+
+        const handleProfileLoaded = (event: CustomEvent) => {
+            setUserProfile(event.detail);
+        };
+
+        window.addEventListener('googleProfileLoaded', handleProfileLoaded as EventListener);
+        window.addEventListener('googleSignOut', () => setUserProfile(null));
+
+        return () => {
+            window.removeEventListener('googleProfileLoaded', handleProfileLoaded as EventListener);
+            window.removeEventListener('googleSignOut', () => setUserProfile(null));
+        };
+    }, []);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchCode(event.target.value);
     };
-
 
     async function fetchCourses() {
         setIsLoading(true);
@@ -79,6 +95,7 @@ export function SearchCourse() {
             catch(error: any) {
                 console.log(error)
             }}
+
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-md mt-8">
             <h1 className="text-2xl font-bold mb-4 text-center">Search Courses</h1>
@@ -118,11 +135,11 @@ export function SearchCourse() {
                               
                                 
                                 <button className="mt-auto self-end bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow" onClick={() => {
-                                    if (!user) {
-                                        alert("You need to be logged in first")
+                                    if (!userProfile) {
+                                        alert("You need to be signed in with Google first")
                                     } else {
                                     const cartItem: CartItem= {
-                                        userName: user.id,
+                                        userName: userProfile.email || '',
                                         courseCode: course.courseCode,
                                         courseName: course.courseName,
                                         examTime: course.examTime,

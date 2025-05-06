@@ -108,6 +108,35 @@ export default function Calendar() {
     }
   };
 
+  const findExistingCalendar = async (token: string): Promise<string | null> => {
+    try {
+      const response = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const existingCalendar = data.items.find((calendar: any) => 
+        calendar.summary === "Course Scheduler Calendar"
+      );
+
+      if (existingCalendar) {
+        console.log("Found existing calendar:", existingCalendar.id);
+        return existingCalendar.id;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error finding existing calendar:", error);
+      return null;
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     if (!isGoogleScriptLoaded) {
       setError("Google services not loaded yet. Please try again in a moment.");
@@ -130,7 +159,17 @@ export default function Calendar() {
             setAccessToken(response.access_token);
             localStorage.setItem('googleAccessToken', response.access_token);
             await fetchUserProfile(response.access_token);
-            await createPublicCalendar(response.access_token);
+            
+            // First try to find an existing calendar
+            const existingCalendarId = await findExistingCalendar(response.access_token);
+            if (existingCalendarId) {
+              console.log("Using existing calendar");
+              setCalendarId(existingCalendarId);
+              localStorage.setItem('calendarId', existingCalendarId);
+            } else {
+              // If no existing calendar found, create a new one
+              await createPublicCalendar(response.access_token);
+            }
           }
         },
       });
