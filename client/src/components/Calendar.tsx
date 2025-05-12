@@ -22,8 +22,6 @@ declare global {
 const CLIENT_ID = "258944424686-9q49i46gskidoaftott0e99bev4p3dve.apps.googleusercontent.com";
 const SCOPES = "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.profile";
 
-//const CALENDAR_ID = "primary";
-
 
 export default function Calendar() {
   const [calendarId, setCalendarId] = useState<string | null>(null);
