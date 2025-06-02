@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>dev.nicoanderic</groupId>
-	<artifactId>brown-course-scheduler</artifactId>
+	<artifactId>server</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>brown-course-scheduler</name>
 	<description>A personal course planning tool for Brown University</description>
