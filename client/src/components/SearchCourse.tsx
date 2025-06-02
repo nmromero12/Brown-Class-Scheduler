@@ -87,7 +87,7 @@ export function SearchCourse() {
                     type="text"
                     value={searchCode}
                     onChange={handleInputChange}
-                    placeholder="Enter Course Code (Please use uppercase)"
+                    placeholder="Enter Course Code (Ex: ANTH 0100)"
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
