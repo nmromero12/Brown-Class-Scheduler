@@ -1,6 +1,5 @@
 # Brown-Class-Scheduler
 
-# Brown Course Scheduler
 
 A course scheduler for Brown University students to find their courses and add them to their cart.
 
