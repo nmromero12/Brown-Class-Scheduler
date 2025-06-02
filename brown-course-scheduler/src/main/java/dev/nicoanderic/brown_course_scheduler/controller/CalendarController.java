@@ -30,18 +30,27 @@ public class CalendarController {
   EventParserService eventParserService = new EventParserService();
 
   @Value("${clerk.secretKey}")
-  private String clerkSecretKey; // Store Clerk Secret Key in application.properties
+  private String clerkSecretKey; // Clerk Secret Key loaded from application properties
 
+  /**
+   * Adds an event to the user's Google Calendar.
+   *
+   * @param clerkToken Authorization header token from client (not currently used directly)
+   * @param eventRequest Event details provided in the request body
+   * @return A confirmation message including the created event's Google Calendar link
+   * @throws Exception if user ID or Google access token cannot be retrieved
+   */
   @PostMapping("/add-event")
   public String addEvent(@RequestHeader("Authorization") String clerkToken, @RequestBody EventRequest eventRequest) throws Exception {
-    // Extract user ID from the request
+    // Parse and format the incoming event details
     EventRequest formattedEventRequest = eventParserService.parse(eventRequest);
+
     String userId = eventRequest.getUserId();
     if (userId == null || userId.isEmpty()) {
       throw new Exception("User ID is required");
     }
 
-    // Fetch Google OAuth access token from Clerk
+    // Construct URL to fetch Google OAuth token associated with this user from Clerk
     RestTemplate restTemplate = new RestTemplate();
     String clerkApiUrl = "https://api.clerk.dev/v1/users/" + userId + "/oauth_access_tokens/oauth_google";
 
@@ -51,9 +60,10 @@ public class CalendarController {
 
     HttpEntity<String> entity = new HttpEntity<>(headers);
 
+    // Call Clerk API to get the OAuth access token for Google Calendar
     String response = restTemplate.exchange(clerkApiUrl, HttpMethod.GET, entity, String.class).getBody();
 
-    // Parse the response to extract the access token
+    // Parse JSON response to extract token
     ObjectMapper mapper = new ObjectMapper();
     ArrayNode tokenData = (ArrayNode) mapper.readTree(response);
     String accessToken = null;
@@ -65,7 +75,7 @@ public class CalendarController {
       throw new Exception("Failed to retrieve Google access token");
     }
 
-    // Proceed with Google Calendar API
+    // Build Google Calendar service client using OAuth token
     NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
     JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
@@ -76,10 +86,12 @@ public class CalendarController {
         .setApplicationName("Brown Course Scheduler")
         .build();
 
+    // Create Google Calendar event and set basic details
     Event event = new Event()
         .setSummary(formattedEventRequest.getSummary())
         .setDescription(formattedEventRequest.getDescription());
 
+    // Parse start and end times, set timezone and apply to event
     DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
     EventDateTime start = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(
         ZonedDateTime.parse(formattedEventRequest.getStartTime(), formatter).toInstant().toEpochMilli())).setTimeZone("America/New_York");
@@ -88,11 +100,14 @@ public class CalendarController {
 
     event.setStart(start);
     event.setEnd(end);
+
+    // Add recurrence rules if any
     List<String> recurrence = Arrays.asList(formattedEventRequest.getRecurrenceRule());
     event.setRecurrence(recurrence);
 
-
+    // Insert event into user's primary calendar
     Event createdEvent = service.events().insert("primary", event).execute();
+
     return "Event created: " + createdEvent.getHtmlLink();
   }
 }
