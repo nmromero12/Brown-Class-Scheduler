@@ -111,6 +111,7 @@ export function SearchCourse() {
                     type="text"
                     value={searchCode}
                     onChange={handleInputChange}
+
                     placeholder="Enter Course Code (e.g. CSCI 0300, ANTH 0100)"
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />

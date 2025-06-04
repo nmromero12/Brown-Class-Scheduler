@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 public class CalendarController {
   EventParserService eventParserService = new EventParserService();
 
+
   @PostMapping("/add-event")
   public String addEvent(@RequestHeader("Authorization") String authHeader, @RequestBody EventRequest eventRequest) throws Exception {
     // Extract access token from Authorization header
@@ -30,14 +31,14 @@ public class CalendarController {
       throw new Exception("Access token is required");
     }
 
-    // Format the event request
     EventRequest formattedEventRequest = eventParserService.parse(eventRequest);
+
     String userId = eventRequest.getUserId();
     if (userId == null || userId.isEmpty()) {
       throw new Exception("User ID is required");
     }
 
-    // Proceed with Google Calendar API
+
     NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
     JacksonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
@@ -61,11 +62,11 @@ public class CalendarController {
     if (calendarId == null) {
       throw new Exception("Course Scheduler Calendar not found");
     }
-
     Event event = new Event()
         .setSummary(formattedEventRequest.getSummary())
         .setDescription(formattedEventRequest.getDescription());
 
+    // Parse start and end times, set timezone and apply to event
     DateTimeFormatter formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
     EventDateTime start = new EventDateTime().setDateTime(new com.google.api.client.util.DateTime(
         ZonedDateTime.parse(formattedEventRequest.getStartTime(), formatter).toInstant().toEpochMilli())).setTimeZone("America/New_York");
@@ -74,8 +75,11 @@ public class CalendarController {
 
     event.setStart(start);
     event.setEnd(end);
+
+    // Add recurrence rules if any
     List<String> recurrence = Arrays.asList(formattedEventRequest.getRecurrenceRule());
     event.setRecurrence(recurrence);
+
 
     // Insert the event into the Course Scheduler Calendar
     Event createdEvent = service.events().insert(calendarId, event).execute();
