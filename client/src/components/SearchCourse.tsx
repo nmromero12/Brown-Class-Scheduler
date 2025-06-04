@@ -1,7 +1,6 @@
-import { useState} from "react"
+import { useState, useEffect, useContext } from "react"
 import { ChangeEvent } from "react";
 import { useCart } from "./CartContext";
-import { useUser } from "@clerk/clerk-react";
 
 export type Course = {
     id: number;
@@ -29,14 +28,40 @@ export function SearchCourse() {
     const [resultMessage, setResultMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<String | null>(null);
-    const {addToCart,  cartItems} = useCart();
-    const { user } = useUser();
+    const {addToCart} = useCart()
+    const [userProfile, setUserProfile] = useState<{ id: string, picture?: string } | null>(null);
 
+    useEffect(() => {
+        const storedProfile = localStorage.getItem('googleUserProfile');
+        console.log('Stored profile:', storedProfile);
+        if (storedProfile) {
+            const profile = JSON.parse(storedProfile);
+            console.log('Parsed profile:', profile);
+            setUserProfile(profile);
+        }
+
+        const handleProfileLoaded = (event: CustomEvent) => {
+            console.log('Profile loaded event:', event.detail);
+            setUserProfile(event.detail);
+        };
+
+        window.addEventListener('googleProfileLoaded', handleProfileLoaded as EventListener);
+        window.addEventListener('googleSignOut', () => setUserProfile(null));
+
+        return () => {
+            window.removeEventListener('googleProfileLoaded', handleProfileLoaded as EventListener);
+            window.removeEventListener('googleSignOut', () => setUserProfile(null));
+        };
+    }, []);
+
+    // Add a debug effect to monitor userProfile changes
+    useEffect(() => {
+        console.log('Current userProfile:', userProfile);
+    }, [userProfile]);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchCode(event.target.value);
     };
-
 
     async function fetchCourses() {
         setIsLoading(true);
@@ -73,12 +98,11 @@ export function SearchCourse() {
                     throw new Error("Failed to add item");
                 }
                 console.log("Item added successfully");
-                
             })}
-                
             catch(error: any) {
                 console.log(error)
             }}
+
     return (
         <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-md mt-8">
             <h1 className="text-2xl font-bold mb-4 text-center">Search Courses</h1>
@@ -87,7 +111,8 @@ export function SearchCourse() {
                     type="text"
                     value={searchCode}
                     onChange={handleInputChange}
-                    placeholder="Enter Course Code (Ex: ANTH 0100)"
+
+                    placeholder="Enter Course Code (e.g. CSCI 0300, ANTH 0100)"
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
             </div>
@@ -117,12 +142,12 @@ export function SearchCourse() {
                                 <p><strong>Section:</strong> {course.section}</p>
                               
                                 
-                                <button className="mt-auto self-end bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow" onClick={() => {
-                                    if (!user) {
-                                        alert("You need to be logged in first")
+                                <button className="mt-auto self-end bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow" onClick={async () => {
+                                    if (!userProfile) {
+                                        alert("You need to be signed in with Google first")
                                     } else {
                                     const cartItem: CartItem= {
-                                        userName: user.id,
+                                        userName: userProfile.id || '',
                                         courseCode: course.courseCode,
                                         courseName: course.courseName,
                                         examTime: course.examTime,
@@ -130,9 +155,13 @@ export function SearchCourse() {
                                         classTime: course.classTime,
                                         crn: course.crn
                                     };
-                                    addtoCartRepository(cartItem)
-                                    console.log(cartItem.userName)
-                                    addToCart(cartItem)}}}>
+                                    try {
+                                        await addtoCartRepository(cartItem);
+                                        await addToCart(cartItem);
+                                    } catch (error) {
+                                        console.error("Failed to add item:", error);
+                                    }
+                                }}}>
                                   Add To Cart
                                 </button>
                               </li>
