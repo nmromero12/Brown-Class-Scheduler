@@ -49,7 +49,7 @@ const Login = () => {
                         {/* Email Input */}
                         <div>
                             <label htmlFor="email" className="block text-sm font-semibold text-red-900 mb-2">
-                                Brown Email Address
+                                Email Address
                             </label>
                             <input
                                 id="email"
