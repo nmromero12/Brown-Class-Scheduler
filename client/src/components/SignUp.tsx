@@ -135,7 +135,6 @@ const SignUp = () => {
                 {/* University Notice */}
                 <div className="mt-6 text-center text-xs text-red-600">
                     <p>Intended for Brown University students</p>
-                    <p className="mt-1">Use your Brown credentials to create an account</p>
                 </div>
             </div>
         </div>
