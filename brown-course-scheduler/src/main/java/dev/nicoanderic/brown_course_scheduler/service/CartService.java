@@ -21,12 +21,12 @@ public class CartService {
    * Retrieves all cart items for a specific user.
    * If no items are found, a message indicating an empty cart is returned.
    *
-   * @param clerkUserId the ID of the user (from Clerk)
+   * @param uid the ID of the user (from Firebase)
    * @return a map containing either a "No cart" message or a list of cart items
    */
-  public Object getCartItems(String clerkUserId) {
+  public Object getCartItems(String uid) {
     Map<String, Object> result = new HashMap<>();
-    List<CartItem> userItems = cartItemRepository.findByuserName(clerkUserId);
+    List<CartItem> userItems = cartItemRepository.findByuid(uid);
     if (userItems.isEmpty()) {
       result.put("result", "No cart");
     } else {

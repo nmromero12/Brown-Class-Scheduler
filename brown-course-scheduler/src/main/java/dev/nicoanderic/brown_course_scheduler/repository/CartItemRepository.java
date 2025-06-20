@@ -14,10 +14,10 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
   /**
    * Finds all CartItem records associated with the given user name.
    *
-   * @param userName the user name to filter cart items by
+   * @param uid the user name to filter cart items by
    * @return a list of CartItems belonging to the specified user
    */
-  List<CartItem> findByuserName(String userName);
+  List<CartItem> findByuid(String uid);
 
   /**
    * Finds a CartItem by its item ID.

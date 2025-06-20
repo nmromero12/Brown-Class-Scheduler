@@ -1,8 +1,17 @@
-
 import { NavLink } from "react-router-dom";
 import Cart from "./Cart";
+import { getAuth, signOut } from "firebase/auth";
 
 export default function Navbar() {
+  const SignOut = () => {
+    const auth = getAuth();
+    signOut(auth).then(() => {
+  // Sign-out successful.
+}).catch((error) => {
+  // An error happened.
+});
+
+  }
   return (
     <nav className="bg-yellow-950 text-white px-4 py-3 shadow-md">
       <div className="max-w-full mx-auto flex items-center justify-between">
@@ -25,11 +34,16 @@ export default function Navbar() {
         {/* Right: Icons */}
         <div className="flex items-center space-x-4">
           <div className="mr-5">
-            
+            <Cart></Cart>
           </div>
 
-          {/* User Button (conditionally rendered) */}
-          
+          {/* Sign Out Button */}
+          <button
+            onClick={SignOut}
+            className="bg-red-700 hover:bg-red-800 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            Sign Out
+          </button>
         </div>
       </div>
     </nav>

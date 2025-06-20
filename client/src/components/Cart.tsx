@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "./CartContext";
 import { getAuth } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Cart() {
   const [showCart, setShowCart] = useState(false);
@@ -24,10 +25,17 @@ export default function Cart() {
   const toggleCart = () => setShowCart((prev) => !prev);
 
   useEffect(() => {
-    populateCart();
-  }, [user]);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        if (currentUser) {
+            populateCartForUser(currentUser.uid);
+        } else {
+            initializeCart([]); // clear cart if logged out
+        }
+    });
+    return () => unsubscribe();
+}, []);
 
-  async function populateCart() {
+  async function populateCartForUser(uid: string) {
     if (user) {
       try {
         const response = await fetch(
