@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import Login from "./components/Login.tsx";
 
 import { initializeApp} from "firebase/app";
+import  SignUp  from "./components/SignUp.tsx"
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Routes>
         <Route path="/" element={<App/> } />
         <Route path="/login" element={<Login/> } />
+        <Route path="/signup" element={<SignUp/>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
