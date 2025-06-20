@@ -8,6 +8,7 @@ import Login from "./components/Login.tsx";
 import { initializeApp} from "firebase/app";
 import  SignUp  from "./components/SignUp.tsx"
 import AuthRoute from "./components/AuthRoute.tsx";
+import { getAuth, setPersistence, browserSessionPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -19,6 +20,15 @@ const firebaseConfig = {
 };
 
 initializeApp(firebaseConfig)
+const auth = getAuth()
+
+setPersistence(auth, browserSessionPersistence)
+  .then(() => {
+    console.log("Session persistence set");
+  })
+  .catch((error) => {
+    console.error("Error setting session persistence", error);
+  });
 
 
 

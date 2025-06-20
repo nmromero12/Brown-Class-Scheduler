@@ -8,7 +8,9 @@ import Calendar from "./components/Calendar.tsx";
 function App() {
 
   return (
-    <div>Welcome</div>
+    <>
+    <Navbar/>
+    </>
   )
   // return (
   //   <>

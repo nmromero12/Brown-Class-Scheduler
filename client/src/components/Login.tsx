@@ -119,7 +119,6 @@ const Login = () => {
                 {/* University Notice */}
                 <div className="mt-6 text-center text-xs text-red-600">
                     <p>Intended for Brown University students</p>
-                    <p className="mt-1">Use your Brown credentials to access the class scheduler</p>
                 </div>
             </div>
         </div>

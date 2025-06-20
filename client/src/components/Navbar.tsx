@@ -1,9 +1,4 @@
-import {
-  UserButton,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-} from "@clerk/clerk-react";
+
 import { NavLink } from "react-router-dom";
 import Cart from "./Cart";
 
@@ -30,20 +25,11 @@ export default function Navbar() {
         {/* Right: Icons */}
         <div className="flex items-center space-x-4">
           <div className="mr-5">
-            <Cart></Cart>
+            
           </div>
 
           {/* User Button (conditionally rendered) */}
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="px-3 py-1 bg-indigo-600 rounded hover:bg-indigo-500">
-                Sign In
-              </button>
-            </SignInButton>
-          </SignedOut>
+          
         </div>
       </div>
     </nav>
