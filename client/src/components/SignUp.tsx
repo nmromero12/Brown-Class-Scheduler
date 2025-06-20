@@ -125,7 +125,7 @@ const SignUp = () => {
                     <div className="mt-8 text-center space-y-2">
                         <div className="text-sm text-red-600">
                             Already have an account? {' '}
-                            <a href="#" className="font-semibold hover:text-red-800 transition-colors">
+                            <a href="/login" className="font-semibold hover:text-red-800 transition-colors">
                                 Sign in here
                             </a>
                         </div>
