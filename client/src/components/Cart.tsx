@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "./CartContext";
-import { useUser, useAuth } from "@clerk/clerk-react";
+import { getAuth } from "firebase/auth";
 
 export default function Cart() {
   const [showCart, setShowCart] = useState(false);
   const { cartItems, removeFromCart, initializeCart } = useCart();
-  const { user } = useUser();
-  const { getToken } = useAuth();
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   const cartRef = useRef<HTMLDivElement | null>(null);
   const cartIconRef = useRef<HTMLImageElement | null>(null);
@@ -31,7 +31,7 @@ export default function Cart() {
     if (user) {
       try {
         const response = await fetch(
-          `http://localhost:8080/cart/user/${user.id}`
+          `http://localhost:8080/cart/user/${user.uid}`
         );
         const data = await response.json();
         if (data.result === "success") {
@@ -63,37 +63,37 @@ export default function Cart() {
       return;
     }
 
-    try {
-      const clerkToken = await getToken();
+    // try {
+    
 
-      const eventRequest: EventRequest = {
-        summary: course.courseName,
-        description: course.courseName,
-        parseTime: course.classTime,
-        recurrenceRule: "",
-        startTime: "",
-        endTime: "",
-        userId: user.id,
-      };
+    //   const eventRequest: EventRequest = {
+    //     summary: course.courseName,
+    //     description: course.courseName,
+    //     parseTime: course.classTime,
+    //     recurrenceRule: "",
+    //     startTime: "",
+    //     endTime: "",
+    //     userId: user.uid,
+    //   };
 
-      const response = await fetch(
-        "http://localhost:8080/api/calendar/add-event",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${clerkToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(eventRequest),
-        }
-      );
+    //   // const response = await fetch(
+    //   //   "http://localhost:8080/api/calendar/add-event",
+    //   //   {
+    //   //     method: "POST",
+    //   //     headers: {
+    //   //       Authorization: `Bearer ${clerkToken}`,
+    //   //       "Content-Type": "application/json",
+    //   //     },
+    //   //     body: JSON.stringify(eventRequest),
+    //   //   }
+    //   // );
 
-      if (!response.ok) throw new Error("Failed to add event");
+    //   if (!response.ok) throw new Error("Failed to add event");
 
-      console.log(response);
-    } catch (err) {
-      console.error("Error adding event:", err);
-    }
+    //   console.log(response);
+    // } catch (err) {
+    //   console.error("Error adding event:", err);
+    // }
   };
 
   return (
@@ -143,14 +143,14 @@ export default function Cart() {
                     >
                       Remove
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => {
                         handleAddEvent(course);
                       }}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       Add to GCAL
-                    </button>
+                    </button> */}
                   </div>
                 </li>
               ))}

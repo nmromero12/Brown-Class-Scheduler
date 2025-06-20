@@ -1,7 +1,8 @@
 import { useState} from "react"
 import { ChangeEvent } from "react";
 import { useCart } from "./CartContext";
-import { useUser } from "@clerk/clerk-react";
+import { getAuth } from "firebase/auth";
+
 
 export type Course = {
     id: number;
@@ -30,7 +31,8 @@ export function SearchCourse() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<String | null>(null);
     const {addToCart,  cartItems} = useCart();
-    const { user } = useUser();
+    const auth = getAuth();
+    const user = auth.currentUser;
 
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +124,7 @@ export function SearchCourse() {
                                         alert("You need to be logged in first")
                                     } else {
                                     const cartItem: CartItem= {
-                                        userName: user.id,
+                                        userName: user.uid,
                                         courseCode: course.courseCode,
                                         courseName: course.courseName,
                                         examTime: course.examTime,
