@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "./CartContext";
-import { getAuth } from "firebase/auth";
-import { onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { X, Calendar } from "lucide-react";
 
 export default function Cart() {
   const [showCart, setShowCart] = useState(false);
@@ -12,42 +12,46 @@ export default function Cart() {
   const cartRef = useRef<HTMLDivElement | null>(null);
   const cartIconRef = useRef<HTMLImageElement | null>(null);
 
-  type EventRequest = {
-    summary: string;
-    description: string;
-    parseTime: string;
-    recurrenceRule: string;
-    startTime: string;
-    endTime: string;
-    userId: string;
-  };
-
   const toggleCart = () => setShowCart((prev) => !prev);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        if (currentUser) {
-            populateCartForUser(currentUser.uid);
-        } else {
-            initializeCart([]); // clear cart if logged out
-        }
+      if (currentUser) {
+        populateCartForUser(currentUser.uid);
+      } else {
+        initializeCart([]);
+      }
     });
     return () => unsubscribe();
-}, []);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        cartRef.current &&
+        !cartRef.current.contains(event.target as Node) &&
+        !cartIconRef.current?.contains(event.target as Node)
+      ) {
+        setShowCart(false);
+      }
+    };
+
+    if (showCart) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showCart]);
 
   async function populateCartForUser(uid: string) {
-    if (user) {
-      try {
-        const response = await fetch(
-          `http://localhost:8080/cart/user/${user.uid}`
-        );
-        const data = await response.json();
-        if (data.result === "success") {
-          initializeCart(data.items);
-        }
-      } catch (error: any) {
-        console.log(error);
+    try {
+      const response = await fetch(`http://localhost:8080/cart/user/${uid}`);
+      const data = await response.json();
+      if (data.result === "success") {
+        initializeCart(data.items);
       }
+    } catch (error: any) {
+      console.log(error);
     }
   }
 
@@ -65,108 +69,92 @@ export default function Cart() {
     }
   }
 
-  const handleAddEvent = async (course: any) => {
+  const handleExportCalendar = async () => {
     if (!user) {
-      console.log("Please sign in");
+      alert("Please sign in to export calendar");
       return;
     }
-
-    // try {
-    
-
-    //   const eventRequest: EventRequest = {
-    //     summary: course.courseName,
-    //     description: course.courseName,
-    //     parseTime: course.classTime,
-    //     recurrenceRule: "",
-    //     startTime: "",
-    //     endTime: "",
-    //     userId: user.uid,
-    //   };
-
-    //   // const response = await fetch(
-    //   //   "http://localhost:8080/api/calendar/add-event",
-    //   //   {
-    //   //     method: "POST",
-    //   //     headers: {
-    //   //       Authorization: `Bearer ${clerkToken}`,
-    //   //       "Content-Type": "application/json",
-    //   //     },
-    //   //     body: JSON.stringify(eventRequest),
-    //   //   }
-    //   // );
-
-    //   if (!response.ok) throw new Error("Failed to add event");
-
-    //   console.log(response);
-    // } catch (err) {
-    //   console.error("Error adding event:", err);
-    // }
+    console.log("Exporting calendar for courses:", cartItems);
+    alert("Calendar export functionality will be implemented soon!");
   };
 
   return (
     <div className="relative">
+      {/* Cart Icon */}
       <img
         ref={cartIconRef}
-        src="src/components/assets/shopping-cart.png" // replace with your image path
+        src="src/components/assets/shopping-cart.png"
         alt="Cart Icon"
         onClick={toggleCart}
-        className="cursor-pointer" // Adds a cursor pointer for better user interaction
-        style={{ width: "30px", height: "30px" }} // You can adjust the size of the icon here
+        className="cursor-pointer hover:opacity-80 transition"
+        style={{ width: "30px", height: "30px" }}
       />
+
+      {/* Cart Dropdown */}
       {showCart && (
         <div
           ref={cartRef}
-          className="absolute right-2 mt-2 w-96 bg-white shadow-xl rounded-lg p-6 z-50"
-          style={{
-            top: cartIconRef.current ? cartIconRef.current.offsetTop + 40 : 0, // Attach the cart menu to the icon
-            right: "2px", // Adjust the position slightly to the left from the right edge
-            maxHeight: "calc(100vh - 64px)", // Prevent the cart from being too large and overflowing
-            overflowY: "auto", // Make the cart scrollable
-          }}
+          className="absolute right-0 mt-2 w-80 bg-white shadow-2xl rounded-xl border border-gray-200 py-4 px-4 z-50"
         >
-          <h2 className="text-lg font-bold mb-4 text-gray-800 text-center">
-            Your Course Schedule
-          </h2>
+          <h3 className="text-gray-900 font-semibold text-lg mb-4 border-b border-gray-200 pb-2 text-center">
+            Your Schedule
+          </h3>
+
           {cartItems.length > 0 ? (
-            <ul className="space-y-3 max-h-64 overflow-y-auto">
+            <div className="space-y-3 max-h-64 overflow-y-auto mb-4">
               {cartItems.map((course) => (
-                <li key={course.crn} className="border-b pb-2">
-                  <p className="text-sm font-medium text-gray-700">
-                    {course.courseCode} - {course.courseName}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Section: {course.section} | CRN: {course.crn}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Class: {course.classTime}
-                  </p>
-                  <div className="flex gap-2 mt-2">
+                <div
+                  key={course.crn}
+                  className="bg-gray-50 rounded-lg p-3 border-l-4 border-yellow-800"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900 text-sm">
+                        {course.courseCode}
+                      </p>
+                      <p className="text-gray-600 text-xs mb-1">
+                        {course.courseName}
+                      </p>
+                      <p className="text-gray-500 text-xs">
+                        Section {course.section} | CRN {course.crn}
+                      </p>
+                      <p className="text-gray-500 text-xs">
+                        {course.classTime}
+                      </p>
+                    </div>
                     <button
                       onClick={() => {
                         deleteFromCartRepository(course.crn);
                         removeFromCart(course);
                       }}
-                      className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                      className="text-red-500 hover:text-red-700 p-1"
                     >
-                      Remove
+                      <X className="w-4 h-4" />
                     </button>
-                    {/* <button
-                      onClick={() => {
-                        handleAddEvent(course);
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      Add to GCAL
-                    </button> */}
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           ) : (
-            <p className="text-center text-gray-500">
-              No items added to the cart
-            </p>
+            <div className="text-center py-8">
+              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <p className="text-gray-600 text-sm">No courses added yet</p>
+              <p className="text-gray-500 text-xs mt-1">
+                Search and add courses to build your schedule
+              </p>
+            </div>
+          )}
+
+          {cartItems.length > 0 && (
+            <div className="border-t border-gray-200 pt-3">
+              <button
+                onClick={handleExportCalendar}
+                className="w-full bg-yellow-900 hover:bg-yellow-950 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Export to Calendar
+              </button>
+            </div>
           )}
         </div>
       )}
