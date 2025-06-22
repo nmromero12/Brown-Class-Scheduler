@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import Cart from "./NavBarCart";
 import { getAuth, signOut } from "firebase/auth";
+import NavBarCart from "./NavBarCart";
 
 export default function Navbar() {
   const SignOut = () => {
@@ -34,7 +35,7 @@ export default function Navbar() {
         {/* Right: Icons */}
         <div className="flex items-center space-x-4">
           <div className="mr-5">
-            <Cart></Cart>
+            <NavBarCart/>
           </div>
 
           {/* Sign Out Button */}
