@@ -4,6 +4,7 @@ import { SearchCourse } from "./components/SearchCourse.tsx";
 import { Routes, Route } from "react-router-dom";
 import { CartProvider } from "./components/CartContext.tsx";
 import Calendar from "./components/Calendar.tsx";
+import "./index.css"
 
 function App() {
 
