@@ -3,7 +3,7 @@ import { useCart } from "./CartContext";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { X, Calendar } from "lucide-react";
 
-export default function Cart() {
+export default function NavBarCart() {
   const [showCart, setShowCart] = useState(false);
   const { cartItems, removeFromCart, initializeCart } = useCart();
   const auth = getAuth();

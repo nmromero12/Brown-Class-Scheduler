@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import Cart from "./Cart";
+import Cart from "./NavBarCart";
 import { getAuth, signOut } from "firebase/auth";
 
 export default function Navbar() {
