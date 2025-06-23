@@ -21,7 +21,7 @@ public class EventParserService {
     Map<String, String> responseMap = new HashMap<>();
     String classTime = classDetails.getClassTime();
 
-    // --- Parse days ---
+    // Parse Days
     String classDays = classTime.substring(0, classTime.indexOf(" "));
     List<String> days = new ArrayList<>();
 
@@ -46,7 +46,7 @@ public class EventParserService {
 
       responseMap.put("days", String.join(",", days));
 
-      // --- Parse times ---
+      // Parse Time
       Pattern timePattern = Pattern.compile(
           "(\\d{1,2})(:?\\d{0,2})?(am|pm)-(\\d{1,2})(:?\\d{0,2})?(am|pm)");
       Matcher matcher = timePattern.matcher(classTime);
@@ -70,9 +70,12 @@ public class EventParserService {
 
         responseMap.put("startTime", String.format("%02d:%02d", startHour, startMin));
         responseMap.put("endTime", String.format("%02d:%02d", endHour, endMin));
+
+        String recurrence = buildRecurrence(days);
+        responseMap.put("Recurrence Rule", recurrence);
       }
 
-      // --- Parse location ---
+      // Parse Location
       int timeEndIndex = classTime.indexOf("am", classTime.indexOf("-")) + 2;
       String location = classTime.substring(timeEndIndex).trim();
       responseMap.put("location", location.isEmpty() ? "TBD" : location);
@@ -85,5 +88,11 @@ public class EventParserService {
 
 
     return responseMap;
+  }
+
+  public String buildRecurrence(List<String> dayRecurrence) {
+
+    String daysString = String.join(",", dayRecurrence);
+    return "RRULE:FREQ=WEEKLY;BYDAY=" + daysString;
   }
 }
