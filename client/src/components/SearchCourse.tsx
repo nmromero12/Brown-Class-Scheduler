@@ -27,10 +27,11 @@ export function SearchCourse() {
     const [searchCode, setSearchCode] = useState("");
     const [department, setDepartment] = useState("");
     const [courses, setCourses] = useState<Course[] | null>(null);
-    const [resultMessage, setResultMessage] = useState("");
+    const [resultMessage, setResultMessage] = useState<string| null>(null)
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState(false);
     const { addToCart, cartItems } = useCart();
+    const [searchInput, setSearchInput] = useState("");
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -42,15 +43,20 @@ export function SearchCourse() {
         setDepartment(event.target.value);
     };
 
+    const handleSearch = () => {
+        setSearchInput(searchCode)
+    }
+
     async function fetchCourses() {
         if (!searchCode.trim()) {
-            setError("Please enter a course code");
+            setResultMessage("Please enter a course code");
+            setError(true)
+            setCourses(null)
             return;
         }
 
         setIsLoading(true);
         setCourses(null);
-        setError(null);
         setResultMessage("");
         
         try {
@@ -59,13 +65,14 @@ export function SearchCourse() {
             
             if (data.result === "success") {
                 setCourses(data.courses);
+                setError(false);
                 console.log(data.courses);
             } else {
                 setCourses(null);
                 setResultMessage(data.message);
             }
         } catch (error: any) {
-            setError("Sorry, connection to server failed");
+            setResultMessage("Sorry connection to server failed");
         } finally {
             setIsLoading(false);
         }
@@ -109,6 +116,16 @@ export function SearchCourse() {
         addtoCartRepository(cartItem);
         addToCart(cartItem);
     };
+
+    const clearSearch = () => {
+        setCourses(null);
+        setResultMessage("");
+        setError(false);
+        setIsLoading(false)
+        setSearchCode("");
+
+    }
+
 
     return (
         <div className="space-y-6">
@@ -159,12 +176,21 @@ export function SearchCourse() {
                     </div>
                     
                     <button
-                        onClick={fetchCourses}
+                        onClick={ () => {
+                            fetchCourses();
+                            handleSearch();
+                        }}
                         disabled={isLoading}
                         className="w-full bg-brown-600 hover:bg-brown-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Search className="w-5 h-5 mr-2" />
                         {isLoading ? "Searching..." : "Search Courses"}
+                    </button>
+
+                    <button
+                        onClick={clearSearch}
+                        className="w-full bg-brown-600 hover:bg-brown-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+                        Clear Search
                     </button>
                 </div>
             </div>
@@ -174,7 +200,7 @@ export function SearchCourse() {
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                     <div className="flex items-center">
                         <div className="text-red-500 mr-3">⚠️</div>
-                        <p className="text-red-800">{error}</p>
+                        <p className="text-red-800">{resultMessage}</p>
                     </div>
                 </div>
             )}
@@ -186,7 +212,7 @@ export function SearchCourse() {
                     <div className="flex items-center justify-between bg-brown-50 rounded-xl p-4 border border-brown-200">
                         <div>
                             <h3 className="text-lg font-semibold text-brown-900">
-                                {courses.length} courses found for "{searchCode}"
+                                {courses.length} courses found for "{searchInput}"
                             </h3>
                             <p className="text-brown-700 text-sm">
                                 Click "Add to Schedule" to build your course plan
@@ -257,7 +283,7 @@ export function SearchCourse() {
             )}
 
             {/* Empty State */}
-            {!courses && !resultMessage && !error && !isLoading && (
+            {!resultMessage && (
                 <div className="text-center py-12">
                     <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">Search for courses</h3>
