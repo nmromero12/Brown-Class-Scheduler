@@ -42,33 +42,45 @@ public class EventParserService {
       }
     }
 
-    responseMap.put("days", String.join(",", days));
+    try {
 
-    // --- Parse times ---
-    Pattern timePattern = Pattern.compile("(\\d{1,2})(:?\\d{0,2})?(am|pm)-(\\d{1,2})(:?\\d{0,2})?(am|pm)");
-    Matcher matcher = timePattern.matcher(classTime);
+      responseMap.put("days", String.join(",", days));
 
-    if (matcher.find()) {
-      int startHour = Integer.parseInt(matcher.group(1));
-      int startMin = matcher.group(2) != null && !matcher.group(2).isEmpty()
-          ? Integer.parseInt(matcher.group(2).substring(1)) : 0;
-      if (matcher.group(3).equalsIgnoreCase("pm") && startHour != 12) startHour += 12;
-      if (matcher.group(3).equalsIgnoreCase("am") && startHour == 12) startHour = 0;
+      // --- Parse times ---
+      Pattern timePattern = Pattern.compile(
+          "(\\d{1,2})(:?\\d{0,2})?(am|pm)-(\\d{1,2})(:?\\d{0,2})?(am|pm)");
+      Matcher matcher = timePattern.matcher(classTime);
 
-      int endHour = Integer.parseInt(matcher.group(4));
-      int endMin = matcher.group(5) != null && !matcher.group(5).isEmpty()
-          ? Integer.parseInt(matcher.group(5).substring(1)) : 0;
-      if (matcher.group(6).equalsIgnoreCase("pm") && endHour != 12) endHour += 12;
-      if (matcher.group(6).equalsIgnoreCase("am") && endHour == 12) endHour = 0;
+      if (matcher.find()) {
+        int startHour = Integer.parseInt(matcher.group(1));
+        int startMin = matcher.group(2) != null && !matcher.group(2).isEmpty()
+            ? Integer.parseInt(matcher.group(2).substring(1)) : 0;
+        if (matcher.group(3).equalsIgnoreCase("pm") && startHour != 12)
+          startHour += 12;
+        if (matcher.group(3).equalsIgnoreCase("am") && startHour == 12)
+          startHour = 0;
 
-      responseMap.put("startTime", String.format("%02d:%02d", startHour, startMin));
-      responseMap.put("endTime", String.format("%02d:%02d", endHour, endMin));
+        int endHour = Integer.parseInt(matcher.group(4));
+        int endMin = matcher.group(5) != null && !matcher.group(5).isEmpty()
+            ? Integer.parseInt(matcher.group(5).substring(1)) : 0;
+        if (matcher.group(6).equalsIgnoreCase("pm") && endHour != 12)
+          endHour += 12;
+        if (matcher.group(6).equalsIgnoreCase("am") && endHour == 12)
+          endHour = 0;
+
+        responseMap.put("startTime", String.format("%02d:%02d", startHour, startMin));
+        responseMap.put("endTime", String.format("%02d:%02d", endHour, endMin));
+      }
+
+      // --- Parse location ---
+      int timeEndIndex = classTime.indexOf("am", classTime.indexOf("-")) + 2;
+      String location = classTime.substring(timeEndIndex).trim();
+      responseMap.put("location", location.isEmpty() ? "TBD" : location);
+      responseMap.put("result", "success");
+    } catch (Exception e) {
+      responseMap.put("result", "fail");
+      responseMap.put("error", "sorry not able to parse the class time");
     }
-
-    // --- Parse location ---
-    int timeEndIndex = classTime.indexOf("am", classTime.indexOf("-")) + 2;
-    String location = classTime.substring(timeEndIndex).trim();
-    responseMap.put("location", location.isEmpty() ? "TBD" : location);
 
 
 
