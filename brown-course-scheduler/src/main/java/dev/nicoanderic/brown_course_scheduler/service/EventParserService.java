@@ -49,7 +49,7 @@ public class EventParserService {
     String startTime = null;
     String endTime = null;
     String location = "TBD";
-    String description = null;
+    String description = buildRecurrence(days);
     String recurrence = null;
 
     if (matcher.find()) {
@@ -72,7 +72,7 @@ public class EventParserService {
       startTime = String.format("%02d%02d00", startHour, startMin);
       endTime = String.format("%02d%02d00", endHour, endMin);
 
-      recurrence = buildRecurrence(days);
+
       description = classDetails.getCourseName() + " " + classDetails.getSection();
 
       // Parse Location based on where the match ends
@@ -105,6 +105,6 @@ public class EventParserService {
   public String buildRecurrence(List<String> dayRecurrence) {
 
     String daysString = String.join(",", dayRecurrence);
-    return "RRULE:FREQ=WEEKLY;BYDAY=" + daysString;
+    return "FREQ=WEEKLY;BYDAY=" + daysString;
   }
 }

@@ -9,20 +9,20 @@ public class ParsedEventDto {
   private List<String> days;
   private String location;
   private String description;
-  private String recurrenceRule;
+  private String recurrence;
 
   // ✅ No-arg constructor (needed for serialization/deserialization)
   public ParsedEventDto() {}
 
   // ✅ All-args constructor
   public ParsedEventDto(String startTime, String endTime, List<String> days,
-      String location, String description, String recurrenceRule) {
+      String location, String description, String recurrence) {
     this.startTime = startTime;
     this.endTime = endTime;
     this.days = days;
     this.location = location;
     this.description = description;
-    this.recurrenceRule = recurrenceRule;
+    this.recurrence = recurrence;
   }
 
   // ✅ Getters and Setters
@@ -66,11 +66,11 @@ public class ParsedEventDto {
     this.description = description;
   }
 
-  public String getRecurrenceRule() {
-    return recurrenceRule;
+  public String getRecurrence() {
+    return recurrence;
   }
 
-  public void setRecurrenceRule(String recurrenceRule) {
-    this.recurrenceRule = recurrenceRule;
+  public void setRecurrenceRule(String recurrence) {
+    this.recurrence = recurrence;
   }
 }
