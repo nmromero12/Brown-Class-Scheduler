@@ -73,6 +73,8 @@ public class EventParserService {
 
         String recurrence = buildRecurrence(days);
         responseMap.put("Recurrence Rule", recurrence);
+        String description = classDetails.getCourseName() + " " + classDetails.getSection();
+        responseMap.put("Description", description);
       }
 
       // Parse Location
