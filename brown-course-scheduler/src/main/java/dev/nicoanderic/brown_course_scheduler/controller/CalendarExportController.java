@@ -1,5 +1,6 @@
 package dev.nicoanderic.brown_course_scheduler.controller;
 
+import dev.nicoanderic.brown_course_scheduler.dto.ParsedEventDto;
 import dev.nicoanderic.brown_course_scheduler.model.CartItem;
 import dev.nicoanderic.brown_course_scheduler.service.EventParserService;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,8 @@ public class CalendarExportController {
   }
 
   @PostMapping("/parse-cart")
-  public ResponseEntity<List<Map<String, String>>> parseCart(@RequestBody List<CartItem> cartItems) {
-    List<Map<String, String>> parsedList = cartItems.stream()
+  public ResponseEntity<List<ParsedEventDto>> parseCart(@RequestBody List<CartItem> cartItems) {
+    List<ParsedEventDto> parsedList = cartItems.stream()
         .map(eventParserService::parseClassTime)
         .toList();
 
