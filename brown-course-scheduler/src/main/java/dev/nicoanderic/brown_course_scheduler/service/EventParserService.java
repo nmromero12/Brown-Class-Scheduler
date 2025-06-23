@@ -1,5 +1,6 @@
 package dev.nicoanderic.brown_course_scheduler.service;
 
+import dev.nicoanderic.brown_course_scheduler.dto.ParsedEventDto;
 import dev.nicoanderic.brown_course_scheduler.model.CartItem;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,7 @@ public class EventParserService {
    * Parses a CartItem's classTime field into structured fields:
    * days, startTime, endTime, location, and description.
    */
-  public Map<String, String> parseClassTime(CartItem classDetails) {
-    Map<String, String> responseMap = new HashMap<>();
+  public ParsedEventDto parseClassTime(CartItem classDetails) {
     String classTime = classDetails.getClassTime();
 
     // Parse Days
@@ -42,55 +42,65 @@ public class EventParserService {
       }
     }
 
-    try {
+    // Parse Time
+    Pattern timePattern = Pattern.compile("(\\d{1,2})(:?\\d{0,2})?(am|pm)-(\\d{1,2})(:?\\d{0,2})?(am|pm)");
+    Matcher matcher = timePattern.matcher(classTime);
 
-      responseMap.put("days", String.join(",", days));
+    String startTime = null;
+    String endTime = null;
+    String location = "TBD";
+    String description = null;
+    String recurrence = null;
 
-      // Parse Time
-      Pattern timePattern = Pattern.compile(
-          "(\\d{1,2})(:?\\d{0,2})?(am|pm)-(\\d{1,2})(:?\\d{0,2})?(am|pm)");
-      Matcher matcher = timePattern.matcher(classTime);
+    if (matcher.find()) {
+      int startHour = Integer.parseInt(matcher.group(1));
+      int startMin = matcher.group(2) != null && !matcher.group(2).isEmpty()
+          ? Integer.parseInt(matcher.group(2).substring(1)) : 0;
+      if (matcher.group(3).equalsIgnoreCase("pm") && startHour != 12)
+        startHour += 12;
+      if (matcher.group(3).equalsIgnoreCase("am") && startHour == 12)
+        startHour = 0;
 
-      if (matcher.find()) {
-        int startHour = Integer.parseInt(matcher.group(1));
-        int startMin = matcher.group(2) != null && !matcher.group(2).isEmpty()
-            ? Integer.parseInt(matcher.group(2).substring(1)) : 0;
-        if (matcher.group(3).equalsIgnoreCase("pm") && startHour != 12)
-          startHour += 12;
-        if (matcher.group(3).equalsIgnoreCase("am") && startHour == 12)
-          startHour = 0;
+      int endHour = Integer.parseInt(matcher.group(4));
+      int endMin = matcher.group(5) != null && !matcher.group(5).isEmpty()
+          ? Integer.parseInt(matcher.group(5).substring(1)) : 0;
+      if (matcher.group(6).equalsIgnoreCase("pm") && endHour != 12)
+        endHour += 12;
+      if (matcher.group(6).equalsIgnoreCase("am") && endHour == 12)
+        endHour = 0;
 
-        int endHour = Integer.parseInt(matcher.group(4));
-        int endMin = matcher.group(5) != null && !matcher.group(5).isEmpty()
-            ? Integer.parseInt(matcher.group(5).substring(1)) : 0;
-        if (matcher.group(6).equalsIgnoreCase("pm") && endHour != 12)
-          endHour += 12;
-        if (matcher.group(6).equalsIgnoreCase("am") && endHour == 12)
-          endHour = 0;
+      startTime = String.format("%02d%02d00", startHour, startMin);
+      endTime = String.format("%02d%02d00", endHour, endMin);
 
-        responseMap.put("startTime", String.format("%02d:%02d", startHour, startMin));
-        responseMap.put("endTime", String.format("%02d:%02d", endHour, endMin));
+      recurrence = buildRecurrence(days);
+      description = classDetails.getCourseName() + " " + classDetails.getSection();
 
-        String recurrence = buildRecurrence(days);
-        responseMap.put("Recurrence Rule", recurrence);
-        String description = classDetails.getCourseName() + " " + classDetails.getSection();
-        responseMap.put("Description", description);
+      // Parse Location based on where the match ends
+      int matchEnd = matcher.end();
+      String remaining = classTime.substring(matchEnd).trim();
+      if (!remaining.isEmpty()) {
+        location = remaining;
       }
 
-      // Parse Location
-      int timeEndIndex = classTime.indexOf("am", classTime.indexOf("-")) + 2;
-      String location = classTime.substring(timeEndIndex).trim();
-      responseMap.put("location", location.isEmpty() ? "TBD" : location);
-      responseMap.put("result", "success");
-    } catch (Exception e) {
-      responseMap.put("result", "fail");
-      responseMap.put("error", "sorry not able to parse the class time");
+      return new ParsedEventDto(
+          startTime,
+          endTime,
+          days,
+          location,
+          description,
+          recurrence
+      );
     }
 
-
-
-    return responseMap;
+    // fallback if no match
+    throw new IllegalArgumentException("Could not parse class time: " + classTime);
   }
+
+
+
+
+
+
 
   public String buildRecurrence(List<String> dayRecurrence) {
 
