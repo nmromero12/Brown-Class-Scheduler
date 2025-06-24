@@ -23,6 +23,16 @@ export type CartItem = {
     crn: string;
 }
 
+export type parsedCartItem = {
+    startTime: string;
+    endTime: string;
+    days: string[];
+    location: string;
+    description: string;
+    recurrence: string;
+
+}
+
 export function SearchCourse() {
     const [searchCode, setSearchCode] = useState("");
     const [department, setDepartment] = useState("");

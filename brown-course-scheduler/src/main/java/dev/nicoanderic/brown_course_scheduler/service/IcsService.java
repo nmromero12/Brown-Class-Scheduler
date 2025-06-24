@@ -36,10 +36,12 @@ public class IcsService {
 
       sb.append("LOCATION:").append(escapeText(parsedEventDto.getLocation())).append("\n");
       sb.append("DESCRIPTION:").append(escapeText(parsedEventDto.getDescription())).append("\n");
-
+      sb.append("END:VEVENT\n");
     }
 
-    sb.append("END:VEVENT\n");
+    sb.append("END:VCALENDAR\n");
+
+
 
 
     return sb.toString();

@@ -22,6 +22,8 @@ public class CalendarExportController {
     this.icsService = icsService;
   }
 
+
+
   @PostMapping("/parse-cart")
   public ResponseEntity<List<ParsedEventDto>> parseCart(@RequestBody List<CartItem> cartItems) {
     List<ParsedEventDto> parsedList = cartItems.stream()
@@ -34,7 +36,7 @@ public class CalendarExportController {
   @PostMapping("/ics")
   public ResponseEntity<String> formatIcs(@RequestBody List<ParsedEventDto> parsedCartItems) {
     String icsFile = icsService.convertToIcs(parsedCartItems);
-    if (parsedCartItems == null || parsedCartItems.isEmpty()) {
+    if (parsedCartItems.isEmpty()) {
       return ResponseEntity.badRequest().body("No events to convert");
     }
     return ResponseEntity.ok(icsFile);

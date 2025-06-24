@@ -45,3 +45,6 @@ export function CartProvider({ children }: CartProviderProps) {
     </CartContext.Provider>
   );
 }
+
+
+
