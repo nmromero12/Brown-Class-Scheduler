@@ -123,6 +123,8 @@ export function SearchCourse() {
             crn: course.crn
         };
 
+        
+
         addtoCartRepository(cartItem);
         addToCart(cartItem);
     };
@@ -271,11 +273,15 @@ export function SearchCourse() {
                                 
                                 <button
                                     onClick={() => handleAddToCart(course)}
-                                    disabled={cartItems.some(item => item.crn === course.crn)}
+                                    disabled={cartItems.some(item => item.crn === course.crn) || cartItems.length >= 6}
                                     className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center ml-4 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
+>
                                     <Plus className="w-4 h-4 mr-2" />
-                                    {cartItems.some(item => item.crn === course.crn) ? "Added" : "Add to Schedule"}
+                                    {cartItems.some(item => item.crn === course.crn)
+                                        ? "Added"
+                                        : cartItems.length >= 6
+                                        ? "Limit Reached"
+                                        : "Add to Schedule"}
                                 </button>
                             </div>
                         </div>
