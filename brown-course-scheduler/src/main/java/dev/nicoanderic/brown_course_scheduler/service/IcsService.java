@@ -2,6 +2,8 @@ package dev.nicoanderic.brown_course_scheduler.service;
 
 import dev.nicoanderic.brown_course_scheduler.dto.ParsedEventDto;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +27,7 @@ public class IcsService {
 
       sb.append("BEGIN:VEVENT\n")
           .append("UID:").append(UUID.randomUUID()).append("\n")
+          .append("DTSTAMP:").append(getCurrentUtcTimestamp()).append("\n")
           .append("SUMMARY:").append(escapeText(parsedEventDto.getDescription())).append("\n")
           .append("DTSTART;TZID=America/New_York:")
           .append(getNextStartDateTime(parsedEventDto.getStartTime())).append("\n")
@@ -60,6 +63,11 @@ public class IcsService {
         .replace(",", "\\,")
         .replace(";", "\\;")
         .replace("\n", "\\n");
+  }
+
+  private String getCurrentUtcTimestamp() {
+    return ZonedDateTime.now(ZoneOffset.UTC)
+        .format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
   }
 
 }
