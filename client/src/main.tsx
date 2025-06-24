@@ -9,6 +9,8 @@ import { initializeApp} from "firebase/app";
 import  SignUp  from "./components/SignUp.tsx"
 import AuthRoute from "./components/AuthRoute.tsx";
 import { getAuth, setPersistence, browserSessionPersistence } from "firebase/auth";
+import { Friends } from "./components/Friends.tsx";
+import { Calendar } from "./components/Calendar.tsx";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -40,6 +42,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<AuthRoute><App/></AuthRoute> } />
         <Route path="/login" element={<Login/> } />
         <Route path="/signup" element={<SignUp/>} />
+        <Route path="/calendar" element={<Calendar/>} />
+        <Route path="/friends" element={<Friends/>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
