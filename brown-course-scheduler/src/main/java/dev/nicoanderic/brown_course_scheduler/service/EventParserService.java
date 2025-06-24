@@ -49,8 +49,8 @@ public class EventParserService {
     String startTime = null;
     String endTime = null;
     String location = "TBD";
-    String description = buildRecurrence(days);
-    String recurrence = null;
+    String description = null;
+    String recurrence = buildRecurrence(days);
 
     if (matcher.find()) {
       int startHour = Integer.parseInt(matcher.group(1));
