@@ -1,8 +1,11 @@
-import { doc, setDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, serverTimestamp, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db, auth } from "../main.tsx";
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-// --- Firestore functions ---
+export type FriendRequest = {
+    status: string;
+    email: string;
+}
 
 export async function addUser(userId: string, userData: object) {
     await setDoc(doc(db, "users", userId), userData)
@@ -10,90 +13,68 @@ export async function addUser(userId: string, userData: object) {
 
 export async function addFriend(userId: string, friendId: string, friendEmail: string) {
     const friendsRef = collection(db, "users", userId, "friends");
-    await setDoc(doc(friendsRef, friendId), { email: friendEmail });
+    await setDoc(doc(friendsRef, friendId), { email: friendEmail })
 }
 
-export async function sendFriendRequest(senderId: string, receiverId: string, senderEmail: string) {
-    const requests = collection(db, "users", receiverId, "requests");
-    await setDoc(doc(requests, senderId), { status: "pending", email: senderEmail });
+export async function sendFriendRequest(senderId: string, recieverId: string, senderEmail: string) {
+    const requests = collection(db, "users", recieverId , "requests");
+    await setDoc(doc(requests, senderId), {status: "pending",
+                                            email: senderEmail
+    })
 }
 
 export async function getFriendRequests(userId: string) {
     const requestsRef = collection(db, "users", userId, "requests");
     const snapshot = await getDocs(requestsRef);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-}
-
-export async function getUserByEmail(email: string) {
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("email", "==", email));
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-        return { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
-    } else {
-        return null;
-    }
+    return snapshot.docs.map(doc => doc.data());
 }
 
 export async function acceptFriendRequest(userId: string, friendId: string, friendEmail: string, userEmail: string) {
     await addFriend(userId, friendId, friendEmail);
     await addFriend(friendId, userId, userEmail);
-    await deleteDoc(doc(db, "users", userId, "requests", friendId));
+
+    await deleteDoc(doc(db, "users", userId, "requests"));
+
 }
 
-// --- React Component ---
+
+
+export async function getUserByEmail(email: string) {
+    const usersRef = collection(db, "users");
+    const q = query(
+                    usersRef, 
+                    where("email", "==", email),
+                    where("email", "!=", auth.currentUser?.email));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+        return querySnapshot.docs[0].data();
+    } else {
+        return null
+    }
+}
+
 export function Friends() {
-    const [friendRequests, setFriendRequests] = useState<any[]>([]);
+    const [userSearch, setUserSearch] = useState("");
+    const [requestsFound, setRequestsFound] = useState<FriendRequest[]>([]);
+    const [requestsScreen, setRequestsScreen] = useState<boolean>(false);
+    const [searchScreen, setSearchScreen] = useState<boolean>(true);
+    const [friendsScreen, setFriendsScreen] = useState<boolean>(false);
+    const [usersFound, setUsersFound] = useState<any>(null);
     const [addFriendEmail, setAddFriendEmail] = useState("");
     const [addFriendResult, setAddFriendResult] = useState<string>("");
-    const [refresh, setRefresh] = useState(false);
 
-    // Load friend requests on mount or refresh
-    useEffect(() => {
-        const fetchRequests = async () => {
-            if (auth.currentUser) {
-                const requests = await getFriendRequests(auth.currentUser.uid);
-                setFriendRequests(requests);
-            }
-        };
-        fetchRequests();
-    }, [refresh]);
-
-    // Send friend request
-    const handleSendRequest = async () => {
-        setAddFriendResult("");
-        if (!auth.currentUser) {
-            setAddFriendResult("You must be logged in.");
-            return;
-        }
-        if (addFriendEmail === auth.currentUser.email) {
-            setAddFriendResult("You can't send a request to yourself.");
-            return;
-        }
-        const user = await getUserByEmail(addFriendEmail);
-        if (!user) {
-            setAddFriendResult("User not found.");
-            return;
-        }
-        try {
-            await sendFriendRequest(auth.currentUser.uid, user.id, auth.currentUser.email!);
-            setAddFriendResult("Friend request sent!");
-        } catch {
-            setAddFriendResult("Error sending request.");
-        }
+    // Test getUserByEmail
+    const handleSearch = async () => {
+        const user = await getUserByEmail(userSearch);
+        setUsersFound(user);
     };
 
-    // Accept friend request
-    const handleAccept = async (request: any) => {
-        if (!auth.currentUser) return;
-        await acceptFriendRequest(
-            auth.currentUser.uid,
-            request.id,
-            request.email,
-            auth.currentUser.email!
-        );
-        setRefresh(r => !r); // Refresh requests
-    };
+    const handleRequests = async() => {
+        
+    }
+
+    
 
     return (
         <div className="max-w-6xl mx-auto px-4 py-8">
@@ -103,12 +84,27 @@ export function Friends() {
     </div>
 
     <div className="bg-white border border-gray-200 p-1 inline-flex rounded-md mb-6">
-      <button className="px-4 py-2 text-white bg-brown-600 rounded-l">Search Friends</button>
-      <button className="px-4 py-2">Friend Requests <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">3</span></button>
-      <button className="px-4 py-2 rounded-r">My Friends <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">5</span></button>
+      <button onClick={() =>{
+        setSearchScreen(true);
+        setFriendsScreen(false);
+        setRequestsScreen(false);
+      }} className="px-4 py-2 text-white bg-brown-600 rounded-l">Search Friends</button>
+      <button onClick={() =>{
+        setSearchScreen(false);
+        setFriendsScreen(false);
+        setRequestsScreen(true);
+      }} className="px-4 py-2">Friend Requests <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">3</span></button>
+      <button onClick={() =>{
+        setSearchScreen(false);
+        setFriendsScreen(true);
+        setRequestsScreen(false);
+      }} className="px-4 py-2 rounded-r">My Friends <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">5</span></button>
     </div>
 
     {/* Search Friends */}
+
+    {searchScreen && (
+   <>   
     <div className="bg-white rounded-lg shadow border mb-6">
       <div className="p-6 space-y-4">
         <h2 className="text-2xl font-semibold text-gray-900">Find Friends</h2>
@@ -118,8 +114,9 @@ export function Friends() {
         </div>
       </div>
     </div>
+   
 
-    {/* Placeholder search result */}
+   
     <div className="space-y-4">
       <div className="bg-brown-50 rounded-xl p-4 border border-brown-200">
         <h3 className="text-lg font-semibold text-brown-900">3 users found for "placeholder"</h3>
@@ -138,7 +135,14 @@ export function Friends() {
       </div>
     </div>
 
+    </>
+
+    )
+}
+
+
     {/* Friend Requests */}
+    {requestsScreen && (
     <div className="bg-white rounded-lg shadow border mt-8 mb-6">
       <div className="p-6 space-y-6">
         <h3 className="text-xl font-semibold text-gray-900">Incoming Requests</h3>
@@ -159,8 +163,11 @@ export function Friends() {
         </div>
       </div>
     </div>
+)}
 
     {/* Friends List */}
+
+    {friendsScreen && (
     <div className="bg-white rounded-lg shadow border mb-6">
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
@@ -185,7 +192,7 @@ export function Friends() {
           </div>
         </div>
       </div>
-    </div>
+    </div> )}
   </div>
     
     );

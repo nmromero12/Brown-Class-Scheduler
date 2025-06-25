@@ -31,6 +31,17 @@ export default function Navbar() {
           {/* Nav Links */}
           <div className="flex items-center space-x-4 ml-8">
             <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive
+                  ? "underline text-yellow-300"
+                  : "hover:text-yellow-300"
+              }
+            >
+              Search
+            </NavLink>
+            
+            <NavLink
               to="/calendar"
               className={({ isActive }) =>
                 isActive
@@ -50,6 +61,7 @@ export default function Navbar() {
             >
               Friends
             </NavLink>
+            
           </div>
         </div>
 
