@@ -7,6 +7,11 @@ export type FriendRequest = {
     email: string;
 }
 
+export type User = {
+  email: string;
+  date: Date;
+}
+
 export async function addUser(userId: string, userData: object) {
     await setDoc(doc(db, "users", userId), userData)
 }
@@ -48,7 +53,7 @@ export async function getUserByEmail(email: string) {
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty) {
-        return querySnapshot.docs[0].data();
+        return querySnapshot.docs[0];
     } else {
         return null
     }
@@ -60,18 +65,41 @@ export function Friends() {
     const [requestsScreen, setRequestsScreen] = useState<boolean>(false);
     const [searchScreen, setSearchScreen] = useState<boolean>(true);
     const [friendsScreen, setFriendsScreen] = useState<boolean>(false);
-    const [usersFound, setUsersFound] = useState<any>(null);
+    const [usersFound, setUsersFound] = useState<User>();
     const [addFriendEmail, setAddFriendEmail] = useState("");
     const [addFriendResult, setAddFriendResult] = useState<string>("");
+    
 
-    // Test getUserByEmail
+    // Test getUserByEmailexport type user = {
+  
+
     const handleSearch = async () => {
-        const user = await getUserByEmail(userSearch);
-        setUsersFound(user);
+        const userDoc = await getUserByEmail(userSearch);
+        if (userDoc) {
+          const userData = userDoc.data();
+          setUsersFound({
+            email: userData.email,
+            date: userData.date,
+          });
+        } else {
+          setUsersFound(undefined);
+        }
     };
 
     const handleRequests = async() => {
-        
+      const currentUser = auth.currentUser
+      if (!currentUser) {
+        alert("You need to sign in")
+        return;
+      }
+      const requests = await getFriendRequests(currentUser.uid);
+      const friendRequests: FriendRequest[] = requests.map((r: any) => ({
+        status: r.status,
+        email: r.email
+      }));
+      setRequestsFound(friendRequests);
+      
+
     }
 
     
@@ -109,31 +137,35 @@ export function Friends() {
       <div className="p-6 space-y-4">
         <h2 className="text-2xl font-semibold text-gray-900">Find Friends</h2>
         <div className="flex gap-4">
-          <input type="text" placeholder="e.g., john_doe, jane@brown.edu" className="flex-1 border rounded px-4 py-2" />
-          <button className="bg-brown-600 text-white px-4 py-2 rounded hover:bg-brown-700">Search</button>
+          <input type="text" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} placeholder="e.g., john_doe, jane@brown.edu" className="flex-1 border rounded px-4 py-2" />
+          <button onClick={()=>{
+            handleSearch()
+
+          }}className="bg-brown-600 text-white px-4 py-2 rounded hover:bg-brown-700">Search</button>
         </div>
       </div>
     </div>
    
 
-   
+   {usersFound &&(
     <div className="space-y-4">
       <div className="bg-brown-50 rounded-xl p-4 border border-brown-200">
-        <h3 className="text-lg font-semibold text-brown-900">3 users found for "placeholder"</h3>
+        <h3 className="text-lg font-semibold text-brown-900">User Found</h3>
       </div>
 
       <div className="bg-white rounded-lg border p-6 flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">J</div>
           <div>
-            <h4 className="text-lg font-semibold text-gray-900">John Doe</h4>
-            <p className="text-gray-600 text-sm">john@brown.edu</p>
+            <h4 className="text-lg font-semibold text-gray-900">{usersFound?.email}</h4>
+            <p className="text-gray-600 text-sm">{usersFound?.email}</p>
             <span className="mt-1 inline-block bg-brown-100 text-brown-800 text-xs px-2 py-1 rounded">CS '25</span>
           </div>
         </div>
         <button className="bg-brown-600 text-white px-4 py-2 rounded hover:bg-brown-700">Send Request</button>
       </div>
     </div>
+    )}
 
     </>
 
@@ -150,11 +182,13 @@ export function Friends() {
         <div className="bg-gray-50 p-4 rounded-xl border flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">A</div>
+            {requestsFound.map((request) => (
             <div>
-              <h4 className="text-lg font-medium text-gray-900">Alice Smith</h4>
-              <p className="text-gray-600 text-sm">alice@brown.edu</p>
+              <h4 className="text-lg font-medium text-gray-900">{request.email}</h4>
+              <p className="text-gray-600 text-sm">{request.status}</p>
               <p className="text-gray-500 text-xs">Sent 6/22/2025</p>
             </div>
+            ))}
           </div>
           <div className="flex gap-2">
             <button className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">Accept</button>
