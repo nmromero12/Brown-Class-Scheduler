@@ -1,6 +1,6 @@
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db, auth } from "../main.tsx";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export type FriendRequest = {
     status: string;
@@ -65,7 +65,8 @@ export function Friends() {
     const [requestsScreen, setRequestsScreen] = useState<boolean>(false);
     const [searchScreen, setSearchScreen] = useState<boolean>(true);
     const [friendsScreen, setFriendsScreen] = useState<boolean>(false);
-    const [usersFound, setUsersFound] = useState<User>();
+    const [usersFound, setUsersFound] = useState<User | null>(null);
+    const [entrance, setEntrance] = useState<boolean>(true);
     const [addFriendEmail, setAddFriendEmail] = useState("");
     const [addFriendResult, setAddFriendResult] = useState<string>("");
     
@@ -82,8 +83,9 @@ export function Friends() {
             date: userData.date,
           });
         } else {
-          setUsersFound(undefined);
+          setUsersFound(null);
         }
+        setEntrance(false);
     };
 
     const handleRequests = async() => {
@@ -101,6 +103,12 @@ export function Friends() {
       
 
     }
+
+    useEffect(() => {
+      handleRequests()
+
+
+    }, [])
 
     
 
@@ -121,11 +129,15 @@ export function Friends() {
         setSearchScreen(false);
         setFriendsScreen(false);
         setRequestsScreen(true);
+        setEntrance(true);
+        setUserSearch("");
       }} className="px-4 py-2">Friend Requests <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">3</span></button>
       <button onClick={() =>{
         setSearchScreen(false);
         setFriendsScreen(true);
         setRequestsScreen(false);
+        setEntrance(true);
+        setUserSearch("");
       }} className="px-4 py-2 rounded-r">My Friends <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">5</span></button>
     </div>
 
@@ -146,13 +158,24 @@ export function Friends() {
       </div>
     </div>
    
-
-   {usersFound &&(
+        
+          
     <div className="space-y-4">
+      {!usersFound && !entrance && (
       <div className="bg-brown-50 rounded-xl p-4 border border-brown-200">
-        <h3 className="text-lg font-semibold text-brown-900">User Found</h3>
-      </div>
+        <h3 className="text-lg font-semibold text-brown-900">{usersFound ? "User Found" : "No user found"}</h3>
+      </div> )}
 
+      {entrance && (
+  <div className="bg-brown-50 rounded-xl p-4 border border-brown-200 text-center">
+    <h3 className="text-lg font-semibold text-brown-900">Add friends to see their schedule!</h3>
+    <p className="text-gray-600 text-sm mt-2">Search for classmates by email to connect and view their course schedules.</p>
+  </div>
+)}
+      
+      
+      
+        {usersFound &&(
       <div className="bg-white rounded-lg border p-6 flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">J</div>
@@ -164,8 +187,9 @@ export function Friends() {
         </div>
         <button className="bg-brown-600 text-white px-4 py-2 rounded hover:bg-brown-700">Send Request</button>
       </div>
+      )}
     </div>
-    )}
+    
 
     </>
 
@@ -177,8 +201,10 @@ export function Friends() {
     {requestsScreen && (
     <div className="bg-white rounded-lg shadow border mt-8 mb-6">
       <div className="p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-gray-900">Incoming Requests</h3>
+        <h3 className="text-xl font-semibold text-gray-900">Friend Requests</h3>
 
+
+        {requestsFound.length > 0 ? (
         <div className="bg-gray-50 p-4 rounded-xl border flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">A</div>
@@ -195,6 +221,11 @@ export function Friends() {
             <button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">Decline</button>
           </div>
         </div>
+        ) : (
+          <div className="bg-gray-50 p-4 rounded-xl border text-center text-gray-500">
+            No incoming requests
+          </div>
+        )}
       </div>
     </div>
 )}
