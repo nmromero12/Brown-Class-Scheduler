@@ -52,11 +52,11 @@ public class CABService {
 
       HttpEntity<Map<String, String>> request = new HttpEntity<>(payload, headers);
 
-      CourseInformationDto courseLoad = restTemplate.postForObject(
-          CAB_BASE_URL,
-          request,
-          CourseInformationDto.class
-      );
+        CourseInformationDto courseLoad = restTemplate.postForObject(
+            CAB_BASE_URL,
+            request,
+            CourseInformationDto.class
+        );
 
       DatabaseCourse course = new DatabaseCourse();
       course.setCourseCode(courseLoad.getCode());

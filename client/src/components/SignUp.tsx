@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { addUser } from "./Friends";
 
 const SignUp = () => {
     const auth = getAuth();
@@ -22,6 +23,10 @@ const SignUp = () => {
 
         createUserWithEmailAndPassword(auth, email, password).then(response => {
             console.log(response.user.uid);
+            addUser(response.user.uid, {
+                email: response.user.email,
+                createdAt: new Date()
+            })
             navigate("/")
         }).catch(error => {
             console.log(error);

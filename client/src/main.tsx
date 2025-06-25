@@ -11,6 +11,8 @@ import AuthRoute from "./components/AuthRoute.tsx";
 import { getAuth, setPersistence, browserSessionPersistence } from "firebase/auth";
 import { Friends } from "./components/Friends.tsx";
 import { Calendar } from "./components/Calendar.tsx";
+import { getFirestore } from "firebase/firestore";
+import Layout  from "./components/Layout.tsx";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,10 +23,16 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-initializeApp(firebaseConfig)
-const auth = getAuth()
+const app = initializeApp(firebaseConfig)
+const authentication = getAuth()
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-setPersistence(auth, browserSessionPersistence)
+export { app, auth, db }
+
+
+
+setPersistence(authentication, browserSessionPersistence)
   .then(() => {
     console.log("Session persistence set");
   })
@@ -38,12 +46,16 @@ setPersistence(auth, browserSessionPersistence)
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Router>
+
       <Routes>
-        <Route path="/" element={<AuthRoute><App/></AuthRoute> } />
-        <Route path="/login" element={<Login/> } />
-        <Route path="/signup" element={<SignUp/>} />
-        <Route path="/calendar" element={<Calendar/>} />
-        <Route path="/friends" element={<Friends/>} />
+        <Route path="/" element={<AuthRoute><Layout /></AuthRoute>}>
+        <Route index element={<App />} />
+        <Route path="calendar" element={<Calendar />} />
+        <Route path="friends" element={<Friends />} />
+        </Route>
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
