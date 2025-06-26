@@ -25,7 +25,8 @@ const SignUp = () => {
             console.log(response.user.uid);
             addUser(response.user.uid, {
                 email: response.user.email,
-                createdAt: new Date()
+                createdAt: new Date(),
+                uid: response.user.uid,
             })
             navigate("/")
         }).catch(error => {

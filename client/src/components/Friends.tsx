@@ -1,15 +1,17 @@
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, serverTimestamp, deleteDoc, collection, query, where, getDocs, DocumentSnapshot } from 'firebase/firestore';
 import { db, auth } from "../main.tsx";
 import { useState, useEffect } from 'react';
 
 export type FriendRequest = {
     status: string;
-    email: string;
+    senderEmail: string;
+
 }
 
 export type User = {
   email: string;
   date: Date;
+  uid: string;
 }
 
 export async function addUser(userId: string, userData: object) {
@@ -21,18 +23,23 @@ export async function addFriend(userId: string, friendId: string, friendEmail: s
     await setDoc(doc(friendsRef, friendId), { email: friendEmail })
 }
 
-export async function sendFriendRequest(senderId: string, recieverId: string, senderEmail: string) {
-    const requests = collection(db, "users", recieverId , "requests");
-    await setDoc(doc(requests, senderId), {status: "pending",
-                                            email: senderEmail
+export async function sendFriendRequest(senderId: string, recieverId: string, senderEmail: string, recieverEmail: string) {
+    const inRequest = collection(db, "users", recieverId , "incomingRequests");
+    const outRequest = collection(db, "users", senderId, "outgoingRequests")
+    await setDoc(doc(inRequest, senderId), {status: "pending",
+                                            senderEmail: senderEmail                                
+    })
+    
+    await setDoc(doc(outRequest, recieverId), {status: "pending", recieverEmail: recieverEmail
     })
 }
+  
 
-export async function getFriendRequests(userId: string) {
-    const requestsRef = collection(db, "users", userId, "requests");
-    const snapshot = await getDocs(requestsRef);
-    return snapshot.docs.map(doc => doc.data());
-}
+
+// export async function findSentFriendRequests(senderEmail: string) {
+//   const requestsRef = collection(db, "users", user)
+  
+// }
 
 export async function acceptFriendRequest(userId: string, friendId: string, friendEmail: string, userEmail: string) {
     await addFriend(userId, friendId, friendEmail);
@@ -49,11 +56,17 @@ export async function getUserByEmail(email: string) {
     const q = query(
                     usersRef, 
                     where("email", "==", email),
-                    where("email", "!=", auth.currentUser?.email));
+                    where("email", "!=", auth.currentUser?.email))
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty) {
-        return querySnapshot.docs[0];
+        const docSnap = querySnapshot.docs[0];
+        const data = docSnap.data();
+        return {
+          email: data.email,
+          date: data.date,
+          uid: data.uid
+        }
     } else {
         return null
     }
@@ -77,10 +90,10 @@ export function Friends() {
     const handleSearch = async () => {
         const userDoc = await getUserByEmail(userSearch);
         if (userDoc) {
-          const userData = userDoc.data();
           setUsersFound({
-            email: userData.email,
-            date: userData.date,
+            email: userDoc.email,
+            date: userDoc.date,
+            uid: userDoc.uid,
           });
         } else {
           setUsersFound(null);
@@ -185,7 +198,7 @@ export function Friends() {
             <span className="mt-1 inline-block bg-brown-100 text-brown-800 text-xs px-2 py-1 rounded">CS '25</span>
           </div>
         </div>
-        <button className="bg-brown-600 text-white px-4 py-2 rounded hover:bg-brown-700">Send Request</button>
+        <button onClick={() => sendFriendRequest(auth.currentUser?.uid!, usersFound.uid, auth.currentUser?.email!, usersFound.email)}className="bg-brown-600 text-white px-4 py-2 rounded hover:bg-brown-700">Send Request</button>
       </div>
       )}
     </div>
