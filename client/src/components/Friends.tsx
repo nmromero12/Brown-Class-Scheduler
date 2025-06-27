@@ -42,6 +42,22 @@ export async function checkSentRequests(userId: string, friendId: string) {
   
 }
 
+export async function getIncomingRequests(userId: string) {
+  const incomingRef = collection(db, "users", userId, "incomingRequests");
+  const snapshot = await getDocs(incomingRef)
+
+  const requests: FriendRequest[] = snapshot.docs.map((doc) => {
+    const data = doc.data();
+
+    return {
+      status: data.status,
+      email: data.senderEmail,
+    };
+  });
+
+  return requests;
+}
+
   
 
 
@@ -83,15 +99,12 @@ export async function getUserByEmail(email: string) {
 
 export function Friends() {
     const [userSearch, setUserSearch] = useState("");
-    const [requestsFound, setRequestsFound] = useState<FriendRequest[]>([]);
     const [hasSent, setHasSent] = useState<boolean>(false);
     const [activeScreen, setActiveScreen] = useState<'search' | 'requests' | 'friends'>('search');
     const [usersFound, setUsersFound] = useState<User | null>(null);
     const [entrance, setEntrance] = useState<boolean>(true);
     const [isSearching, setIsSearching] = useState(false);
-    const [addFriendEmail, setAddFriendEmail] = useState("");
-    const [addFriendResult, setAddFriendResult] = useState<string>("");
-    
+    const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
     
 
     // Test getUserByEmailexport type user = {
@@ -128,34 +141,27 @@ export function Friends() {
          
     };
 
-    const handleRequests = async() => {
-      const currentUser = auth.currentUser
-      if (!currentUser) {
-        alert("You need to sign in")
-        return;
-      }
-      const requests = await getFriendRequests(currentUser.uid);
-      const friendRequests: FriendRequest[] = requests.map((r: any) => ({
-        status: r.status,
-        email: r.email
-      }));
-      setRequestsFound(friendRequests);
-      
+    
 
+
+    const fetchRequests = async () => {
+    const user = auth.currentUser?.uid;
+    if (user) {
+      const requests = await getIncomingRequests(user);
+      setIncomingRequests(requests);
     }
+  };
+
 
     useEffect(() => {
-      
-
-
-    }, [])
+      fetchRequests();
+    },[])
 
     useEffect(() => {
         if (activeScreen === 'requests') {
             setEntrance(true);
             setUserSearch("");
             setUsersFound(null);
-            handleRequests();
         } else if (activeScreen === 'friends') {
             setEntrance(true);
             setUserSearch("");
@@ -254,35 +260,44 @@ export function Friends() {
 
     {/* Friend Requests */}
     {activeScreen === 'requests' && (
-    <div className="bg-white rounded-lg shadow border mt-8 mb-6">
-      <div className="p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-gray-900">Friend Requests</h3>
+  <div className="bg-white rounded-lg shadow border mt-8 mb-6">
+    <div className="p-6 space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900">Friend Requests</h3>
 
-
-        {requestsFound.length > 0 ? (
-        <div className="bg-gray-50 p-4 rounded-xl border flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">A</div>
-            {requestsFound.map((request) => (
-            <div>
-              <h4 className="text-lg font-medium text-gray-900">{request.email}</h4>
-              <p className="text-gray-600 text-sm">{request.status}</p>
-              <p className="text-gray-500 text-xs">Sent 6/22/2025</p>
+      {incomingRequests.length > 0 ? (
+        incomingRequests.map((request, index) => (
+          <div
+            key={index}
+            className="bg-gray-50 p-4 rounded-xl border flex justify-between items-center"
+          >
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">
+                {request.email.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h4 className="text-lg font-medium text-gray-900">
+                  {request.email}
+                </h4>
+                <p className="text-gray-600 text-sm">{request.status}</p>
+              </div>
             </div>
-            ))}
+            <div className="flex gap-2">
+              <button className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
+                Accept
+              </button>
+              <button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">
+                Decline
+              </button>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <button className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">Accept</button>
-            <button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">Decline</button>
-          </div>
+        ))
+      ) : (
+        <div className="bg-gray-50 p-4 rounded-xl border text-center text-gray-500">
+          No incoming requests
         </div>
-        ) : (
-          <div className="bg-gray-50 p-4 rounded-xl border text-center text-gray-500">
-            No incoming requests
-          </div>
-        )}
-      </div>
+      )}
     </div>
+  </div>
 )}
 
     {/* Friends List */}
