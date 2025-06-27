@@ -84,20 +84,22 @@ export async function getUserByEmail(email: string) {
 export function Friends() {
     const [userSearch, setUserSearch] = useState("");
     const [requestsFound, setRequestsFound] = useState<FriendRequest[]>([]);
-    const [requestsScreen, setRequestsScreen] = useState<boolean>(false);
     const [hasSent, setHasSent] = useState<boolean>(false);
-    const [searchScreen, setSearchScreen] = useState<boolean>(true);
-    const [friendsScreen, setFriendsScreen] = useState<boolean>(false);
+    const [activeScreen, setActiveScreen] = useState<'search' | 'requests' | 'friends'>('search');
     const [usersFound, setUsersFound] = useState<User | null>(null);
     const [entrance, setEntrance] = useState<boolean>(true);
+    const [isSearching, setIsSearching] = useState(false);
     const [addFriendEmail, setAddFriendEmail] = useState("");
     const [addFriendResult, setAddFriendResult] = useState<string>("");
+    
     
 
     // Test getUserByEmailexport type user = {
   
 
     const handleSearch = async () => {
+      try {
+        setIsSearching(true);
         setEntrance(false);
         const userDoc = await getUserByEmail(userSearch);
         if (userDoc) {
@@ -120,8 +122,10 @@ export function Friends() {
           else {
           setUsersFound(null);
           setHasSent(false);
+        }} finally {
+          setIsSearching(false);
         }
-        
+         
     };
 
     const handleRequests = async() => {
@@ -146,6 +150,19 @@ export function Friends() {
 
     }, [])
 
+    useEffect(() => {
+        if (activeScreen === 'requests') {
+            setEntrance(true);
+            setUserSearch("");
+            setUsersFound(null);
+            handleRequests();
+        } else if (activeScreen === 'friends') {
+            setEntrance(true);
+            setUserSearch("");
+            setUsersFound(null);
+        }
+    }, [activeScreen]);
+
     
 
     return (
@@ -155,34 +172,18 @@ export function Friends() {
       <p className="text-gray-600">Connect with classmates and share your course schedules</p>
     </div>
 
+
     <div className="bg-white border border-gray-200 p-1 inline-flex rounded-md mb-6">
-      <button onClick={() =>{
-        setSearchScreen(true);
-        setFriendsScreen(false);
-        setRequestsScreen(false);
-    
-      }} className="px-4 py-2 text-white bg-brown-600 rounded-l">Search Friends</button>
-      <button onClick={() =>{
-        setSearchScreen(false);
-        setFriendsScreen(false);
-        setRequestsScreen(true);
-        setEntrance(true);
-        setUserSearch("");
-        setUsersFound(null);
-      }} className="px-4 py-2">Friend Requests <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">3</span></button>
-      <button onClick={() =>{
-        setSearchScreen(false);
-        setFriendsScreen(true);
-        setRequestsScreen(false);
-        setEntrance(true);
-        setUserSearch("");
-        setUsersFound(null);
-      }} className="px-4 py-2 rounded-r">My Friends <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">5</span></button>
+        <button onClick={() => setActiveScreen('search')} className="px-4 py-2 text-white bg-brown-600 rounded-l">Search Friends</button>
+        <button onClick={() => setActiveScreen('requests')} className="px-4 py-2">Friend Requests <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">3</span></button>
+        <button onClick={() => setActiveScreen('friends')} className="px-4 py-2 rounded-r">My Friends <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">5</span></button>
     </div>
+
+    
 
     {/* Search Friends */}
 
-    {searchScreen && (
+    {activeScreen === 'search' && (
    <>   
     <div className="bg-white rounded-lg shadow border mb-6">
       <div className="p-6 space-y-4">
@@ -197,11 +198,17 @@ export function Friends() {
         </div>
       </div>
     </div>
+
+     {isSearching && (
+    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+      <h3 className="text-lg font-semibold text-blue-900">Searching for friends...</h3>
+    </div>
+  )}
    
         
           
     <div className="space-y-4">
-      {!usersFound && !entrance && (
+      {!entrance && !isSearching &&(
       <div className="bg-brown-50 rounded-xl p-4 border border-brown-200">
         <h3 className="text-lg font-semibold text-brown-900">{usersFound ? "User Found" : "No user found"}</h3>
       </div> )}
@@ -246,7 +253,7 @@ export function Friends() {
 
 
     {/* Friend Requests */}
-    {requestsScreen && (
+    {activeScreen === 'requests' && (
     <div className="bg-white rounded-lg shadow border mt-8 mb-6">
       <div className="p-6 space-y-6">
         <h3 className="text-xl font-semibold text-gray-900">Friend Requests</h3>
@@ -280,7 +287,7 @@ export function Friends() {
 
     {/* Friends List */}
 
-    {friendsScreen && (
+    {activeScreen === 'friends' && (
     <div className="bg-white rounded-lg shadow border mb-6">
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
