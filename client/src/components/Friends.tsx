@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 export type FriendRequest = {
     status: string;
     email: string;
+    uid: string;
 
 }
 
@@ -18,19 +19,23 @@ export async function addUser(userId: string, userData: object) {
     await setDoc(doc(db, "users", userId), userData)
 }
 
-export async function addFriend(userId: string, friendId: string, friendEmail: string) {
+export async function addFriend(userId: string, friendId: string, friendEmail: string, userEmail: string) {
     const friendsRef = collection(db, "users", userId, "friends");
-    await setDoc(doc(friendsRef, friendId), { email: friendEmail })
+    const usersRef = collection(db, "users", friendId, "friends");
+    await setDoc(doc(friendsRef, friendEmail), { email: friendEmail })
+    await setDoc(doc(usersRef, userEmail), {email: userEmail})
+  
 }
 
 export async function sendFriendRequest(senderId: string, recieverId: string, senderEmail: string, recieverEmail: string) {
     const inRequest = collection(db, "users", recieverId , "incomingRequests");
     const outRequest = collection(db, "users", senderId, "outgoingRequests")
     await setDoc(doc(inRequest, senderId), {status: "pending",
-                                            senderEmail: senderEmail                                
+                                            senderEmail: senderEmail,
+                                            uid: senderId                                
     })
     
-    await setDoc(doc(outRequest, recieverId), {status: "pending", recieverEmail: recieverEmail
+    await setDoc(doc(outRequest, recieverId), {status: "pending", recieverEmail: recieverEmail, uid: recieverId
     })
 }
 
@@ -52,6 +57,7 @@ export async function getIncomingRequests(userId: string) {
     return {
       status: data.status,
       email: data.senderEmail,
+      uid: data.uid,
     };
   });
 
@@ -67,10 +73,10 @@ export async function getIncomingRequests(userId: string) {
 // }
 
 export async function acceptFriendRequest(userId: string, friendId: string, friendEmail: string, userEmail: string) {
-    await addFriend(userId, friendId, friendEmail);
-    await addFriend(friendId, userId, userEmail);
+    await addFriend(userId, friendId, friendEmail, userEmail);
 
-    await deleteDoc(doc(db, "users", userId, "requests"));
+    await deleteDoc(doc(db, "users", userId, "incomingRequests", friendId));
+    await deleteDoc(doc(db, "users", friendId, "outgoingRequests", userId));
 
 }
 
@@ -282,7 +288,13 @@ export function Friends() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
+              <button onClick={() => {
+
+                const curUser = auth.currentUser
+                if (curUser) {
+                acceptFriendRequest(curUser.uid, request.uid, request.email, curUser.email!)
+              }
+              }}className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
                 Accept
               </button>
               <button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">
