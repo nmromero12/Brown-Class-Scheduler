@@ -85,4 +85,13 @@ public class CartItem {
   public void setCrn(String crn) {
     this.crn = crn;
   }
+
+  public String getUid() {
+    return uid;
+  }
+
+  public void setUid(String uid) {
+    this.uid = uid;
+  }
 }
+

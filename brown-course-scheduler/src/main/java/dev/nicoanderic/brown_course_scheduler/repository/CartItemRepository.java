@@ -35,10 +35,10 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
    */
   CartItem findByCrn(String crn);
 
-  CartItem findByUserNameAndCrn(String userName, String crn);  // <- Add this
+  CartItem findByUidAndCrn(String uid, String crn);  // <- Add this
 
 
   void deleteByCrn(String crn);
 
-  void deleteByCrnAndUserName(String crn, String username);
+  void deleteByCrnAndUid(String crn, String uid);
 }

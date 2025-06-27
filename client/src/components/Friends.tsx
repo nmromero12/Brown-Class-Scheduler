@@ -15,6 +15,10 @@ export type User = {
   uid: string;
 }
 
+export type Friend = {
+  email: string;
+}
+
 export async function addUser(userId: string, userData: object) {
     await setDoc(doc(db, "users", userId), userData)
 }
@@ -37,6 +41,21 @@ export async function sendFriendRequest(senderId: string, recieverId: string, se
     
     await setDoc(doc(outRequest, recieverId), {status: "pending", recieverEmail: recieverEmail, uid: recieverId
     })
+}
+
+export async function getFriends(userId: string) {
+  const friendsRef = collection(db, "users", userId, "friends");
+  const snapShot = await getDocs(friendsRef);
+  const friends: Friend[] = snapShot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      email: data.email
+    }
+  })
+  return friends
+
+
+
 }
 
 export async function checkSentRequests(userId: string, friendId: string) {
@@ -111,6 +130,7 @@ export function Friends() {
     const [entrance, setEntrance] = useState<boolean>(true);
     const [isSearching, setIsSearching] = useState(false);
     const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
+    const [friends, setFriends] = useState<Friend[]>([]);
     
 
     // Test getUserByEmailexport type user = {
@@ -147,6 +167,15 @@ export function Friends() {
          
     };
 
+
+    const findFriends = async () => {
+    const user = auth.currentUser?.uid;
+    if (user) {
+      const friends = await getFriends(user)
+      setFriends(friends);
+    }
+  }
+
     
 
 
@@ -161,6 +190,7 @@ export function Friends() {
 
     useEffect(() => {
       fetchRequests();
+      findFriends();
     },[])
 
     useEffect(() => {
@@ -315,31 +345,42 @@ export function Friends() {
     {/* Friends List */}
 
     {activeScreen === 'friends' && (
-    <div className="bg-white rounded-lg shadow border mb-6">
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-900">My Friends</h3>
-          <span className="bg-brown-100 text-brown-800 text-sm px-3 py-1 rounded">5 friends</span>
-        </div>
+  <div className="bg-white rounded-lg shadow border mb-6">
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-xl font-semibold text-gray-900">My Friends</h3>
+        <span className="bg-brown-100 text-brown-800 text-sm px-3 py-1 rounded">
+          {friends.length} {friends.length === 1 ? 'friend' : 'friends'}
+        </span>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gray-50 p-4 rounded-xl border flex justify-between">
-            <div className="flex space-x-4">
-              <div className="w-10 h-10 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">M</div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-900">Michael Johnson</h4>
-                <p className="text-gray-600 text-xs">Biology '26</p>
-                <p className="text-green-600 text-xs">● Online</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {friends.length > 0 ? (
+          friends.map((friend, index) => (
+            <div key={index} className="bg-gray-50 p-4 rounded-xl border flex justify-between">
+              <div className="flex space-x-4">
+                <div className="w-10 h-10 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">
+                  {friend.email.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900">{friend.email}</h4>
+                  <p className="text-gray-600 text-xs">Friend</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button className="text-brown-600 hover:text-brown-800" title="View Schedule">📅</button>
+                <button className="text-red-600 hover:text-red-800" title="Remove Friend">🗑️</button>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <button className="text-brown-600 hover:text-brown-800" title="View Schedule">📅</button>
-              <button className="text-red-600 hover:text-red-800" title="Remove Friend">🗑️</button>
-            </div>
-          </div>
-        </div>
+          ))
+        ) : (
+          <div className="text-gray-500 col-span-full">You have no friends yet.</div>
+        )}
       </div>
-    </div> )}
+    </div>
+  </div>
+)}
+
   </div>
     
     );
