@@ -1,7 +1,6 @@
 import "./App.css";
 import Navbar from "./components/Navbar.tsx";
 import { SearchCourse } from "./components/SearchCourse.tsx";
-import { Routes, Route } from "react-router-dom";
 import { CartProvider } from "./components/CartContext.tsx";
 
 import NavBarCart from "./components/NavBarCart.tsx"
@@ -45,6 +44,7 @@ function App() {
         </div>
       </div>
     </CartProvider>
+
   );
 }
 export default App;

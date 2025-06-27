@@ -44,11 +44,13 @@ public class CartService {
    */
   public void addToCart(CartItem cartItem) {
     try {
-      CartItem existing = cartItemRepository.findByCrn(cartItem.getCrn());
-      if (existing == null) {
-        cartItemRepository.saveAndFlush(cartItem);
-      }
-    } catch (Exception e) {
+
+      CartItem existing = cartItemRepository.findByUserNameAndCrn(cartItem.getUserName(), cartItem.getCrn());
+
+    if (existing == null) {
+      cartItemRepository.saveAndFlush(cartItem);
+    }} catch (Exception e) {
+
       System.out.println("Already added to cart");
     }
   }
@@ -59,7 +61,8 @@ public class CartService {
    * @param crn the course registration number to remove
    */
   @Transactional
-  public void deleteFromCart(String crn) {
-    cartItemRepository.deleteByCrn(crn);
+  public void deleteFromCart(String crn, String username) {
+    cartItemRepository.deleteByCrnAndUserName(crn, username);
+    cartItemRepository.flush();
   }
 }

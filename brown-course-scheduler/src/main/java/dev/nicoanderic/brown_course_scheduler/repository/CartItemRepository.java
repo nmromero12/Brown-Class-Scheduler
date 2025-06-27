@@ -35,10 +35,10 @@ public interface CartItemRepository extends JpaRepository<CartItem, Integer> {
    */
   CartItem findByCrn(String crn);
 
-  /**
-   * Deletes CartItem records matching the given CRN.
-   *
-   * @param crn the CRN of the CartItem(s) to delete
-   */
+  CartItem findByUserNameAndCrn(String userName, String crn);  // <- Add this
+
+
   void deleteByCrn(String crn);
+
+  void deleteByCrnAndUserName(String crn, String username);
 }

@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 import { useState, ChangeEvent } from "react";
 import { useCart } from "./CartContext";
 import { getAuth } from "firebase/auth";
 import { Search, Plus, Clock, GraduationCap, Hash } from "lucide-react";
+=======
+import { useState, useEffect, useContext } from "react"
+import { ChangeEvent } from "react";
+import { useCart } from "./CartContext";
+>>>>>>> main
 
 export type Course = {
     id: number;
@@ -23,6 +29,7 @@ export type CartItem = {
     crn: string;
 }
 
+<<<<<<< HEAD
 export type parsedCartItem = {
     startTime: string;
     endTime: string;
@@ -44,11 +51,50 @@ export function SearchCourse() {
     const [searchInput, setSearchInput] = useState("");
     const auth = getAuth();
     const user = auth.currentUser;
+=======
+export function SearchCourse() {
+    const [searchCode, setSearchCode] = useState(""); 
+    const [courses, setCourses] = useState<Course[] | null>(null);
+    const [resultMessage, setResultMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<String | null>(null);
+    const {addToCart} = useCart()
+    const [userProfile, setUserProfile] = useState<{ id: string, picture?: string } | null>(null);
+
+    useEffect(() => {
+        const storedProfile = localStorage.getItem('googleUserProfile');
+        console.log('Stored profile:', storedProfile);
+        if (storedProfile) {
+            const profile = JSON.parse(storedProfile);
+            console.log('Parsed profile:', profile);
+            setUserProfile(profile);
+        }
+
+        const handleProfileLoaded = (event: CustomEvent) => {
+            console.log('Profile loaded event:', event.detail);
+            setUserProfile(event.detail);
+        };
+
+        window.addEventListener('googleProfileLoaded', handleProfileLoaded as EventListener);
+        window.addEventListener('googleSignOut', () => setUserProfile(null));
+
+        return () => {
+            window.removeEventListener('googleProfileLoaded', handleProfileLoaded as EventListener);
+            window.removeEventListener('googleSignOut', () => setUserProfile(null));
+        };
+    }, []);
+
+    // Add a debug effect to monitor userProfile changes
+    useEffect(() => {
+        console.log('Current userProfile:', userProfile);
+    }, [userProfile]);
+>>>>>>> main
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchCode(event.target.value);
     };
 
+<<<<<<< HEAD
     const handleDepartmentChange = (event: ChangeEvent<HTMLSelectElement>) => {
         setDepartment(event.target.value);
     };
@@ -57,6 +103,8 @@ export function SearchCourse() {
         setSearchInput(searchCode)
     }
 
+=======
+>>>>>>> main
     async function fetchCourses() {
         if (!searchCode.trim()) {
             setResultMessage("Please enter a course code");
@@ -96,6 +144,7 @@ export function SearchCourse() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(cartItem)
+<<<<<<< HEAD
             });
             
             if (!response.ok) {
@@ -205,6 +254,30 @@ export function SearchCourse() {
                         Clear Search
                     </button>
                 </div>
+=======
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to add item");
+                }
+                console.log("Item added successfully");
+            })}
+            catch(error: any) {
+                console.log(error)
+            }}
+
+    return (
+        <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-md mt-8">
+            <h1 className="text-2xl font-bold mb-4 text-center">Search Courses</h1>
+            <div className="mb-4">
+                <input
+                    type="text"
+                    value={searchCode}
+                    onChange={handleInputChange}
+
+                    placeholder="Enter Course Code (e.g. CSCI 0300, ANTH 0100)"
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+>>>>>>> main
             </div>
 
             {/* Error State */}
@@ -271,6 +344,7 @@ export function SearchCourse() {
                                     </div>
                                 </div>
                                 
+<<<<<<< HEAD
                                 <button
                                     onClick={() => handleAddToCart(course)}
                                     disabled={cartItems.some(item => item.crn === course.crn) || cartItems.length >= 6}
@@ -282,6 +356,29 @@ export function SearchCourse() {
                                         : cartItems.length >= 6
                                         ? "Limit Reached"
                                         : "Add to Schedule"}
+=======
+                                <button className="mt-auto self-end bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded shadow" onClick={async () => {
+                                    if (!userProfile) {
+                                        alert("You need to be signed in with Google first")
+                                    } else {
+                                    const cartItem: CartItem= {
+                                        userName: userProfile.id || '',
+                                        courseCode: course.courseCode,
+                                        courseName: course.courseName,
+                                        examTime: course.examTime,
+                                        section: course.section,
+                                        classTime: course.classTime,
+                                        crn: course.crn
+                                    };
+                                    try {
+                                        await addtoCartRepository(cartItem);
+                                        await addToCart(cartItem);
+                                    } catch (error) {
+                                        console.error("Failed to add item:", error);
+                                    }
+                                }}}>
+                                  Add To Cart
+>>>>>>> main
                                 </button>
                             </div>
                         </div>

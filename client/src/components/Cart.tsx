@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCart } from "./CartContext";
+
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Calendar, Clock, GraduationCap, X } from "lucide-react";
 import { CartItem, parsedCartItem } from "./SearchCourse";
@@ -8,6 +9,7 @@ export default function Cart() {
   const { cartItems, removeFromCart, initializeCart } = useCart();
   const [parsedItems, setParsedItems] = useState<parsedCartItem[] | []>([]);
   const [icsData, seticsData] = useState<string | null>(null);
+
 
   const auth = getAuth();
   const [user, setUser] = useState<any>(null);
@@ -73,22 +75,41 @@ export default function Cart() {
       }
     } catch (error: any) {
       console.log(error);
+
     }
   }
 
 
 
   async function deleteFromCartRepository(crn: string) {
+    if (!user) {
+      console.error("Delete failed: No user ID available");
+      return;
+    }
+    
     try {
-      await fetch(`http://localhost:8080/cart/deleteItem/${crn}`, {
+      console.log("Attempting to delete item - CRN:", crn, "User ID:", user.uid);
+      const response = await fetch(`http://localhost:8080/cart/deleteItem?crn=${crn}&username=${user.uid}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      console.log("Item deleted successfully");
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server response:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      console.log("Successfully deleted item - CRN:", crn, "User ID:", user.uid);
     } catch (error: any) {
-      console.log(error);
+      console.error("Error deleting item:", {
+        crn,
+        user: user.uid,
+        error: error.message,
+        stack: error.stack
+      });
     }
   }
 
