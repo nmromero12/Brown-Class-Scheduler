@@ -1,116 +1,110 @@
 package dev.nicoanderic.brown_course_scheduler.service;
 
-import dev.nicoanderic.brown_course_scheduler.model.EventRequest;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.HashMap;
+import dev.nicoanderic.brown_course_scheduler.dto.ParsedEventDto;
+import dev.nicoanderic.brown_course_scheduler.model.CartItem;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Service responsible for parsing user-supplied time/location strings into
- * well-structured event information with recurrence and timezone-aware timestamps.
+ * Service responsible for parsing class time strings into structured event info.
  */
+@Service
 public class EventParserService {
 
   /**
-   * Parses a raw EventRequest into a detailed EventRequest with ISO-formatted start/end times
-   * and an RRULE-based recurrence string.
-   *
-   * @param eventRequest The original event request containing a raw time/location string
-   * @return A new EventRequest object with populated recurrence and time fields
+   * Parses a CartItem's classTime field into structured fields:
+   * days, startTime, endTime, location, and description.
    */
-  public EventRequest parse(EventRequest eventRequest) {
-    // Mapping for converting shorthand days to RRULE format
-    HashMap<String, String> recurrenceMap = new HashMap<>();
-    recurrenceMap.put("M", "MO");
-    recurrenceMap.put("W", "WE");
-    recurrenceMap.put("T", "TU");
-    recurrenceMap.put("Th", "TH");
-    recurrenceMap.put("F", "FR");
-    recurrenceMap.put("S", "SA");
+  public ParsedEventDto parseClassTime(CartItem classDetails) {
+    String classTime = classDetails.getClassTime();
 
-    // Mapping for converting shorthand days to java.time.DayOfWeek
-    HashMap<String, DayOfWeek> days = new HashMap<>();
-    days.put("M", DayOfWeek.MONDAY);
-    days.put("T", DayOfWeek.TUESDAY);
-    days.put("W", DayOfWeek.WEDNESDAY);
-    days.put("TH", DayOfWeek.THURSDAY);
-    days.put("F", DayOfWeek.FRIDAY);
-    days.put("S", DayOfWeek.SATURDAY);
+    // Parse Days
+    String classDays = classTime.substring(0, classTime.indexOf(" "));
+    List<String> days = new ArrayList<>();
 
-    String recurrenceRelation = "RRULE:FREQ=WEEKLY;BYDAY=";
-
-    // Extract timing details from the input string
-    String timeLocation = eventRequest.getParseTime();
-    String startDay = timeLocation.charAt(0) + "";
-    String[] timeLocationSplit = timeLocation.split(" ");
-    String dayString = timeLocationSplit[0];
-    String timeString = timeLocationSplit[1];
-    String[] timeSplit = timeString.split("-");
-    String startTime = timeSplit[0];
-    String endTime = timeSplit[1];
-
-    // Find the next date matching the specified day of week
-    LocalDate localDate = LocalDate.now();
-    DayOfWeek dayOfWeek = localDate.getDayOfWeek();
-    while (!days.get(startDay).equals(dayOfWeek)) {
-      localDate = localDate.plusDays(1);
-      dayOfWeek = localDate.getDayOfWeek();
+    int i = 0;
+    while (i < classDays.length()) {
+      if (i + 1 < classDays.length() && classDays.substring(i, i + 2).equals("Th")) {
+        days.add("TH");
+        i += 2;
+      } else {
+        switch (classDays.charAt(i)) {
+          case 'M' -> days.add("MO");
+          case 'T' -> days.add("TU");
+          case 'W' -> days.add("WE");
+          case 'F' -> days.add("FR");
+          case 'S' -> days.add("SA");
+        }
+        i++;
+      }
     }
 
-    // Set up formatter to parse times like "2pm" or "2:50pm"
-    DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
-        .parseCaseInsensitive()
-        .appendPattern("h[:mm]a")
-        .toFormatter();
+    // Parse Time
+    Pattern timePattern = Pattern.compile("(\\d{1,2})(:?\\d{0,2})?(am|pm)-(\\d{1,2})(:?\\d{0,2})?(am|pm)");
+    Matcher matcher = timePattern.matcher(classTime);
 
-    // Convert times to LocalTime objects
-    LocalTime startLocalTime = LocalTime.parse(startTime.toLowerCase(), timeFormatter);
-    LocalTime endLocalTime = LocalTime.parse(endTime.toLowerCase(), timeFormatter);
+    String startTime = null;
+    String endTime = null;
+    String location = "TBD";
+    String description = null;
+    String recurrence = buildRecurrence(days);
 
-    // Convert to ZonedDateTime with Eastern Timezone
-    ZoneId zoneId = ZoneId.of("America/New_York");
-    ZonedDateTime startZonedDateTime = ZonedDateTime.of(localDate, startLocalTime, zoneId);
-    ZonedDateTime endZonedDateTime = ZonedDateTime.of(localDate, endLocalTime, zoneId);
+    if (matcher.find()) {
+      int startHour = Integer.parseInt(matcher.group(1));
+      int startMin = matcher.group(2) != null && !matcher.group(2).isEmpty()
+          ? Integer.parseInt(matcher.group(2).substring(1)) : 0;
+      if (matcher.group(3).equalsIgnoreCase("pm") && startHour != 12)
+        startHour += 12;
+      if (matcher.group(3).equalsIgnoreCase("am") && startHour == 12)
+        startHour = 0;
 
-    // Format times to ISO 8601 with offset
-    DateTimeFormatter isoFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-    String formattedStartTime = startZonedDateTime.format(isoFormatter);
-    String formattedEndTime = endZonedDateTime.format(isoFormatter);
+      int endHour = Integer.parseInt(matcher.group(4));
+      int endMin = matcher.group(5) != null && !matcher.group(5).isEmpty()
+          ? Integer.parseInt(matcher.group(5).substring(1)) : 0;
+      if (matcher.group(6).equalsIgnoreCase("pm") && endHour != 12)
+        endHour += 12;
+      if (matcher.group(6).equalsIgnoreCase("am") && endHour == 12)
+        endHour = 0;
 
-    // Build RRULE BYDAY clause based on which days are present
-    if (dayString.contains("M")) {
-      recurrenceRelation += recurrenceMap.get("M") + ",";
+      startTime = String.format("%02d%02d00", startHour, startMin);
+      endTime = String.format("%02d%02d00", endHour, endMin);
+
+
+      description = classDetails.getCourseName() + " " + classDetails.getSection();
+
+      // Parse Location based on where the match ends
+      int matchEnd = matcher.end();
+      String remaining = classTime.substring(matchEnd).trim();
+      if (!remaining.isEmpty()) {
+        location = remaining;
+      }
+
+      return new ParsedEventDto(
+          startTime,
+          endTime,
+          days,
+          location,
+          description,
+          recurrence
+      );
     }
-    if (dayString.contains("W")) {
-      recurrenceRelation += recurrenceMap.get("W") + ",";
-    }
-    if (dayString.contains("T")) {
-      recurrenceRelation += recurrenceMap.get("T") + ",";
-    }
-    if (dayString.contains("Th")) {
-      recurrenceRelation += recurrenceMap.get("Th") + ",";
-    }
-    if (dayString.contains("F")) {
-      recurrenceRelation += recurrenceMap.get("F") + ",";
-    }
 
-    // Remove the trailing comma
-    recurrenceRelation = recurrenceRelation.substring(0, recurrenceRelation.length() - 1);
+    // fallback if no match
+    throw new IllegalArgumentException("Could not parse class time: " + classTime);
+  }
 
-    // Return new EventRequest with updated fields
-    return new EventRequest(
-        eventRequest.getSummary(),
-        eventRequest.getDescription(),
-        eventRequest.getParseTime(),
-        recurrenceRelation,
-        formattedStartTime,
-        formattedEndTime,
-        eventRequest.getUserId()
-    );
+
+
+
+
+
+
+  public String buildRecurrence(List<String> dayRecurrence) {
+
+    String daysString = String.join(",", dayRecurrence);
+    return "FREQ=WEEKLY;BYDAY=" + daysString;
   }
 }

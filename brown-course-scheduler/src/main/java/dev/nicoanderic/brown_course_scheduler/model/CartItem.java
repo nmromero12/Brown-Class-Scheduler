@@ -10,7 +10,7 @@ public class CartItem {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int itemId;
-  private String userName;
+  private String uid;
   private String courseCode;
   private String courseName;
   private String examTime;
@@ -30,11 +30,11 @@ public class CartItem {
   }
 
   public String getUserName() {
-    return userName;
+    return uid;
   }
 
   public void setUserName(String userName) {
-    this.userName = userName;
+    this.uid = userName;
   }
 
   public String getCourseCode() {
@@ -85,4 +85,13 @@ public class CartItem {
   public void setCrn(String crn) {
     this.crn = crn;
   }
+
+  public String getUid() {
+    return uid;
+  }
+
+  public void setUid(String uid) {
+    this.uid = uid;
+  }
 }
+

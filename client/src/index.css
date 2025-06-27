@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+@theme {
+  --color-brown-50: #f7efe7;
+  --color-brown-100: #e8d4c3;
+  --color-brown-200: #d0b299;
+  --color-brown-300: #b68d70;
+  --color-brown-400: #9f6f53;
+  --color-brown-500: #885b3c;
+  --color-brown-600: #6d4423;
+  --color-brown-700: #532f0f;
+  --color-brown-800: #3a1d06;
+  --color-brown-900: #1d0e00;
+}

@@ -1,114 +1,95 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "./CartContext";
-import CalendarAddEvent from "./CalendarAddEvent";
+
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { Calendar, Clock, GraduationCap, X } from "lucide-react";
+import { CartItem, parsedCartItem } from "./SearchCourse";
 
 export default function Cart() {
-  const [showCart, setShowCart] = useState(false);
   const { cartItems, removeFromCart, initializeCart } = useCart();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [parsedItems, setParsedItems] = useState<parsedCartItem[] | []>([]);
+  const [icsData, seticsData] = useState<string | null>(null);
 
-  const cartRef = useRef<HTMLDivElement | null>(null);
-  const cartIconRef = useRef<HTMLImageElement | null>(null);
 
-  type EventRequest = {
-    summary: string;
-    description: string;
-    parseTime: string;
-    recurrenceRule: string;
-    startTime: string;
-    endTime: string;
-    userId: string;
-  };
-
-  const toggleCart = () => setShowCart((prev) => !prev);
+  const auth = getAuth();
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const handleGoogleSignIn = async () => {
-      console.log("Cart: Handling Google Sign In");
-      const storedToken = localStorage.getItem('googleAccessToken');
-      const storedProfile = localStorage.getItem('googleUserProfile');
-      if (storedToken && storedProfile) {
-        const profile = JSON.parse(storedProfile);
-        console.log("Cart: Setting user ID:", profile.id);
-        setUserId(profile.id);
-        setAccessToken(storedToken);
-        // Wait for state to update before populating cart
-        setTimeout(async () => {
-          await populateCart();
-        }, 0);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        populateCartForUser(currentUser.uid);
+      } else {
+        initializeCart([]);
       }
-    };
+    });
+    return () => unsubscribe();
+  }, []);
 
-    const handleGoogleSignOut = () => {
-      console.log("Cart: Handling Google Sign Out");
-      setUserId(null);
-      setAccessToken(null);
-      initializeCart([]); // Clear cart on sign out
-    };
-
-    // Check for existing session
-    const storedToken = localStorage.getItem('googleAccessToken');
-    const storedProfile = localStorage.getItem('googleUserProfile');
-    if (storedToken && storedProfile) {
-      const profile = JSON.parse(storedProfile);
-      console.log("Cart: Found existing session, user ID:", profile.id);
-      setUserId(profile.id);
-      setAccessToken(storedToken);
-      // Wait for state to update before populating cart
-      setTimeout(async () => {
-        await populateCart();
-      }, 0);
-    }
-
-    window.addEventListener('googleSignIn', handleGoogleSignIn);
-    window.addEventListener('googleSignOut', handleGoogleSignOut);
-
-    return () => {
-      window.removeEventListener('googleSignIn', handleGoogleSignIn);
-      window.removeEventListener('googleSignOut', handleGoogleSignOut);
-    };
-  }, [initializeCart]);
-
-  // Add a separate effect to handle userId changes
   useEffect(() => {
-    if (userId) {
-      console.log("Cart: User ID changed, populating cart for:", userId);
-      populateCart();
-    }
-  }, [userId]);
-
-  async function populateCart() {
-    if (!userId) {
-      console.log("Cart: No user ID available for populating cart");
+    if (cartItems.length == 0) {
+      setParsedItems([]);
+      seticsData(null);
       return;
     }
+    parseCart(cartItems);
     
+    
+  }, [cartItems])
+
+  async function parseCart(cart: CartItem[]) {
+  try {
+    const parsedResponse = await fetch("http://localhost:8080/api/calendar/parse-cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cart),
+    });
+
+    const parsedData = await parsedResponse.json();
+    setParsedItems(parsedData);
+
+    const icsResponse = await fetch("http://localhost:8080/api/calendar/ics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsedData), 
+    });
+
+    const ics = await icsResponse.text();
+    seticsData(ics);
+
+      
+    
+
+
+  } catch (error) {
+    console.error("Error parsing cart:", error);
+  }
+}
+
+  async function populateCartForUser(uid: string) {
     try {
-      console.log("Cart: Fetching cart for user:", userId);
-      const response = await fetch(
-        `http://localhost:8080/cart/user/${userId}`
-      );
+      const response = await fetch(`http://localhost:8080/cart/user/${uid}`);
       const data = await response.json();
-      console.log("Cart: Received cart data:", data);
       if (data.result === "success") {
-        console.log("Cart: Initializing cart with items:", data.items);
         initializeCart(data.items);
       }
     } catch (error: any) {
-      console.error("Error populating cart:", error);
+      console.log(error);
+
     }
   }
 
+
+
   async function deleteFromCartRepository(crn: string) {
-    if (!userId) {
+    if (!user) {
       console.error("Delete failed: No user ID available");
       return;
     }
     
     try {
-      console.log("Attempting to delete item - CRN:", crn, "User ID:", userId);
-      const response = await fetch(`http://localhost:8080/cart/deleteItem?crn=${crn}&username=${userId}`, {
+      console.log("Attempting to delete item - CRN:", crn, "User ID:", user.uid);
+      const response = await fetch(`http://localhost:8080/cart/deleteItem?crn=${crn}&username=${user.uid}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -121,132 +102,120 @@ export default function Cart() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      console.log("Successfully deleted item - CRN:", crn, "User ID:", userId);
+      console.log("Successfully deleted item - CRN:", crn, "User ID:", user.uid);
     } catch (error: any) {
       console.error("Error deleting item:", {
         crn,
-        userId,
+        user: user.uid,
         error: error.message,
         stack: error.stack
       });
     }
   }
 
-  const handleAddEvent = async (course: any) => {
-    if (!userId || !accessToken) {
-      console.log("Please sign in");
+  const handleExportCalendar = async () => {
+    if (!icsData) {
+      alert("Calendar data not ready");
       return;
+      
     }
-
-    try {
-      const eventRequest: EventRequest = {
-        summary: course.courseName,
-        description: course.courseName,
-        parseTime: course.classTime,
-        recurrenceRule: "",
-        startTime: "",
-        endTime: "",
-        userId: userId,
-      };
-      console.log(eventRequest);
-
-      const response = await fetch(
-        "http://localhost:8080/api/calendar/add-event",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(eventRequest),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to add event");
-
-      console.log(response);
-      // Dispatch event to refresh calendar
-      window.dispatchEvent(new Event('calendarRefresh'));
-    } catch (err) {
-      console.error("Error adding event:", err);
-    }
+    const blob = new Blob([icsData], { type: "text/calendar"});
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "brown_schedule.ics";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+    
+    
+    // TODO: Implement calendar export functionality
+    console.log("Exporting calendar for courses:", cartItems);
+    
   };
 
   return (
-    <div className="relative">
-      <img
-        ref={cartIconRef}
-        src="src/components/assets/shopping-cart.png"
-        alt="Cart Icon"
-        onClick={toggleCart}
-        className="cursor-pointer"
-        style={{ width: "30px", height: "30px" }}
-      />
-      {showCart && (
-        <div
-          ref={cartRef}
-          className="absolute right-2 mt-2 w-96 bg-white shadow-xl rounded-lg p-6 z-50"
-          style={{
-            top: cartIconRef.current ? cartIconRef.current.offsetTop + 40 : 0,
-            right: "2px",
-            maxHeight: "calc(100vh - 64px)",
-            overflowY: "auto",
-          }}
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-xl font-semibold text-gray-900">My Schedule</h3>
+        <span className="bg-brown-100 text-brown-800 text-sm font-medium px-3 py-1 rounded-full">
+          {cartItems.length} courses
+        </span>
+      </div>
+
+      {/* Schedule Items */}
+      {cartItems.length > 0 ? (
+        <div className="space-y-3 mb-6">
+          {cartItems.map((course) => (
+            <div key={course.crn} className="bg-gray-50 rounded-lg p-4 border-l-4 border-brown-500">
+              <div className="flex justify-between items-start mb-2">
+                <h4 className="font-medium text-gray-900 text-sm">
+                  {course.courseCode}
+                </h4>
+                <button
+                  onClick={() => {
+                    deleteFromCartRepository(course.crn);
+                    removeFromCart(course);
+                  }}
+                  className="text-gray-400 hover:text-red-500 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-gray-600 text-xs mb-2">
+                {course.courseName}
+              </p>
+              <div className="text-xs text-gray-500 space-y-1">
+                <div className="flex items-center">
+                  <Clock className="w-3 h-3 mr-2" />
+                  <span>{course.classTime}</span>
+                </div>
+                <div className="flex items-center">
+                  <GraduationCap className="w-3 h-3 mr-2" />
+                  <span>{course.examTime || "No final exam"}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8 mb-6">
+          <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+          <p className="text-gray-600 text-sm">No courses added yet</p>
+          <p className="text-gray-500 text-xs mt-1">
+            Search and add courses to build your schedule
+          </p>
+        </div>
+      )}
+
+      {/* Export Button */}
+      {cartItems.length > 0 && (
+        <button
+          onClick={handleExportCalendar}
+          className="w-full bg-brown-600 hover:bg-brown-700 text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center"
         >
-          <h2 className="text-lg font-bold mb-4 text-gray-800 text-center">
-            Your Course Schedule
-          </h2>
-          {cartItems.length > 0 ? (
-            <ul className="space-y-3 max-h-64 overflow-y-auto">
-              {cartItems.map((course) => (
-                <li key={course.crn} className="border-b pb-2">
-                  <p className="text-sm font-medium text-gray-700">
-                    {course.courseCode} - {course.courseName}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Section: {course.section} | CRN: {course.crn}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Class: {course.classTime}
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <button
-                      onClick={async () => {
-                        try {
-                          console.log("Remove button clicked for CRN:", course.crn);
-                          await deleteFromCartRepository(course.crn);
-                          console.log("Database deletion successful, removing from local state");
-                          await removeFromCart(course);
-                          console.log("Local state updated successfully");
-                        } catch (error) {
-                          console.error("Failed to delete item:", {
-                            crn: course.crn,
-                            error: error instanceof Error ? error.message : 'Unknown error',
-                            stack: error instanceof Error ? error.stack : undefined
-                          });
-                        }
-                      }}
-                      className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-                    >
-                      Remove
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleAddEvent(course);
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      Add to GCAL
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-center text-gray-500">
-              No items added to the cart
-            </p>
-          )}
+          <Calendar className="w-4 h-4 mr-2" />
+          Export to Calendar
+        </button>
+      )}
+
+      {/* Schedule Summary */}
+      {cartItems.length > 0 && (
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <h4 className="font-medium text-gray-900 mb-3">Schedule Summary</h4>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-gray-600">Total Courses:</span>
+              <span className="font-medium">{cartItems.length}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Final Exams:</span>
+              <span className="font-medium">
+                {cartItems.filter(item => item.examTime && item.examTime !== "No final exam").length} scheduled
+              </span>
+            </div>
+          </div>
         </div>
       )}
     </div>
