@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
  */
 @Service
 public class EventParserService {
+  private static final String RECURRENCE_UNTIL = "20251212T235959Z";
 
   /**
    * Parses a CartItem's classTime field into structured fields:
@@ -105,6 +106,6 @@ public class EventParserService {
   public String buildRecurrence(List<String> dayRecurrence) {
 
     String daysString = String.join(",", dayRecurrence);
-    return "FREQ=WEEKLY;BYDAY=" + daysString;
+    return "FREQ=WEEKLY;BYDAY=" + daysString + ";UNTIL=" + RECURRENCE_UNTIL;
   }
 }
