@@ -13,6 +13,7 @@ import { Friends } from "./components/Friends.tsx";
 import { Calendar } from "./components/Calendar.tsx";
 import { getFirestore } from "firebase/firestore";
 import Layout  from "./components/Layout.tsx";
+import { UserProvider } from "./components/UserContext.tsx";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -45,6 +46,7 @@ setPersistence(authentication, browserSessionPersistence)
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <UserProvider>
     <Router>
 
       <Routes>
@@ -59,5 +61,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
+    </UserProvider>
   </React.StrictMode>
 );
