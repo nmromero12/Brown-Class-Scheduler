@@ -13,6 +13,8 @@ import { Friends } from "./components/Friends.tsx";
 import { Calendar } from "./components/Calendar.tsx";
 import { getFirestore } from "firebase/firestore";
 import Layout  from "./components/Layout.tsx";
+import { UserProvider } from "./components/UserContext.tsx";
+import { CartProvider } from "./components/CartContext.tsx";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -45,19 +47,22 @@ setPersistence(authentication, browserSessionPersistence)
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Router>
+    <UserProvider>
+        <CartProvider>
+          <Router>
+            <Routes>
+              <Route path="/" element={<AuthRoute><Layout /></AuthRoute>}>
+              <Route index element={<App />} />
+              <Route path="calendar" element={<Calendar />} />
+              <Route path="friends" element={<Friends />} />
+            </Route>
 
-      <Routes>
-        <Route path="/" element={<AuthRoute><Layout /></AuthRoute>}>
-        <Route index element={<App />} />
-        <Route path="calendar" element={<Calendar />} />
-        <Route path="friends" element={<Friends />} />
-        </Route>
-
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </Router>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Router>
+      </CartProvider>
+    </UserProvider>
   </React.StrictMode>
 );

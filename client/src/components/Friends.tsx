@@ -1,6 +1,7 @@
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp, deleteDoc, collection, query, where, getDocs, DocumentSnapshot } from 'firebase/firestore';
 import { db, auth } from "../main.tsx";
 import { useState, useEffect } from 'react';
+import { useUser } from './UserContext.tsx';
 
 export type FriendRequest = {
     status: string;
@@ -132,6 +133,7 @@ export function Friends() {
     const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
     const [friends, setFriends] = useState<Friend[]>([]);
     const [acceptedRequests, setAcceptedRequests] = useState<string[]>([]);
+    const { user } = useUser();
     
 
     // Test getUserByEmailexport type user = {
@@ -151,8 +153,8 @@ export function Friends() {
 
           setUsersFound(foundUser);
 
-          if (auth.currentUser) {
-            const alreadySent = await checkSentRequests(auth.currentUser.uid, foundUser.uid); 
+          if (user) {
+            const alreadySent = await checkSentRequests(user.uid, user.uid); 
             setHasSent(alreadySent);
       }
         } 
@@ -170,9 +172,9 @@ export function Friends() {
 
 
     const findFriends = async () => {
-    const user = auth.currentUser?.uid;
+    
     if (user) {
-      const friends = await getFriends(user)
+      const friends = await getFriends(user.uid)
       setFriends(friends);
 
 
@@ -183,9 +185,9 @@ export function Friends() {
 
 
     const fetchRequests = async () => {
-    const user = auth.currentUser?.uid;
+    
     if (user) {
-      const requests = await getIncomingRequests(user);
+      const requests = await getIncomingRequests(user.uid);
       setIncomingRequests(requests);
     }
   };

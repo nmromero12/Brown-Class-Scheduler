@@ -3,14 +3,9 @@ import { useCart } from "./CartContext";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Calendar, Clock, GraduationCap, X } from "lucide-react";
-import { CartItem, parsedCartItem } from "./SearchCourse";
 
 export default function Cart() {
-  const { cartItems, removeFromCart, initializeCart } = useCart();
-  const [parsedItems, setParsedItems] = useState<parsedCartItem[] | []>([]);
-  const [icsData, seticsData] = useState<string | null>(null);
-
-
+  const { cartItems, removeFromCart, initializeCart, exportCalendar } = useCart();
   const auth = getAuth();
   const [user, setUser] = useState<any>(null);
 
@@ -26,45 +21,9 @@ export default function Cart() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (cartItems.length == 0) {
-      setParsedItems([]);
-      seticsData(null);
-      return;
-    }
-    parseCart(cartItems);
-    
-    
-  }, [cartItems])
+  
 
-  async function parseCart(cart: CartItem[]) {
-  try {
-    const parsedResponse = await fetch("http://localhost:8080/api/calendar/parse-cart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(cart),
-    });
-
-    const parsedData = await parsedResponse.json();
-    setParsedItems(parsedData);
-
-    const icsResponse = await fetch("http://localhost:8080/api/calendar/ics", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(parsedData), 
-    });
-
-    const ics = await icsResponse.text();
-    seticsData(ics);
-
-      
-    
-
-
-  } catch (error) {
-    console.error("Error parsing cart:", error);
-  }
-}
+  
 
   async function populateCartForUser(uid: string) {
     try {
@@ -113,27 +72,7 @@ export default function Cart() {
     }
   }
 
-  const handleExportCalendar = async () => {
-    if (!icsData) {
-      alert("Calendar data not ready");
-      return;
-      
-    }
-    const blob = new Blob([icsData], { type: "text/calendar"});
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "brown_schedule.ics";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-    
-    
-    // TODO: Implement calendar export functionality
-    console.log("Exporting calendar for courses:", cartItems);
-    
-  };
+  
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">
@@ -192,7 +131,7 @@ export default function Cart() {
       {/* Export Button */}
       {cartItems.length > 0 && (
         <button
-          onClick={handleExportCalendar}
+          onClick={exportCalendar}
           className="w-full bg-brown-600 hover:bg-brown-700 text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center"
         >
           <Calendar className="w-4 h-4 mr-2" />
