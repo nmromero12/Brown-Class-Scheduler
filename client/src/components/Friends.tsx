@@ -131,7 +131,7 @@ export function Friends() {
     const [isSearching, setIsSearching] = useState(false);
     const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
     const [friends, setFriends] = useState<Friend[]>([]);
-    const [alreadyAdded, setAlreadyAdded] = useState<boolean>(false);
+    const [acceptedRequests, setAcceptedRequests] = useState<string[]>([]);
     
 
     // Test getUserByEmailexport type user = {
@@ -226,8 +226,8 @@ export function Friends() {
 
     <div className="bg-white border border-gray-200 p-1 inline-flex rounded-md mb-6">
         <button onClick={() => setActiveScreen('search')} className="px-4 py-2 text-white bg-brown-600 rounded-l">Search Friends</button>
-        <button onClick={() => setActiveScreen('requests')} className="px-4 py-2">Friend Requests <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">3</span></button>
-        <button onClick={() => setActiveScreen('friends')} className="px-4 py-2 rounded-r">My Friends <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">5</span></button>
+        <button onClick={() => setActiveScreen('requests')} className="px-4 py-2">Friend Requests <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">{incomingRequests.length}</span></button>
+        <button onClick={() => setActiveScreen('friends')} className="px-4 py-2 rounded-r">My Friends <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">{friends.length}</span></button>
     </div>
 
     
@@ -335,14 +335,18 @@ export function Friends() {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => {
+              <button onClick={async () => {
 
                 const curUser = auth.currentUser
                 if (curUser) {
-                acceptFriendRequest(curUser.uid, request.uid, request.email, curUser.email!)
+                await acceptFriendRequest(curUser.uid, request.uid, request.email, curUser.email!)
+                
+                setIncomingRequests(prev => prev.filter(r => r.uid != request.uid));
+                await findFriends(); 
               }
-              }}className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700">
-                Accept
+              }}className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700"
+                disabled={acceptedRequests.includes(request.uid)}>
+                Accept Request
               </button>
               <button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">
                 Decline
