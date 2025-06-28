@@ -6,7 +6,7 @@ import { Calendar, Clock, GraduationCap, X } from "lucide-react";
 import { CartItem, parsedCartItem } from "./SearchCourse";
 
 export default function Cart() {
-  const { cartItems, removeFromCart, initializeCart } = useCart();
+  const { cartItems, removeFromCart, initializeCart, exportCalendar } = useCart();
   const [parsedItems, setParsedItems] = useState<parsedCartItem[] | []>([]);
   const [icsData, seticsData] = useState<string | null>(null);
 
@@ -192,7 +192,7 @@ export default function Cart() {
       {/* Export Button */}
       {cartItems.length > 0 && (
         <button
-          onClick={handleExportCalendar}
+          onClick={exportCalendar}
           className="w-full bg-brown-600 hover:bg-brown-700 text-white font-medium py-3 px-4 rounded-xl transition-colors flex items-center justify-center"
         >
           <Calendar className="w-4 h-4 mr-2" />

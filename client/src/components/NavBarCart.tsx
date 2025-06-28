@@ -5,7 +5,7 @@ import { X, Calendar } from "lucide-react";
 
 export default function NavBarCart() {
   const [showCart, setShowCart] = useState(false);
-  const { cartItems, removeFromCart, initializeCart } = useCart();
+  const { cartItems, removeFromCart, initializeCart, exportCalendar } = useCart();
   const auth = getAuth();
   const user = auth.currentUser;
 
@@ -75,7 +75,7 @@ export default function NavBarCart() {
       return;
     }
     console.log("Exporting calendar for courses:", cartItems);
-    alert("Calendar export functionality will be implemented soon!");
+    
   };
 
   return (
@@ -148,7 +148,7 @@ export default function NavBarCart() {
           {cartItems.length > 0 && (
             <div className="border-t border-gray-200 pt-3">
               <button
-                onClick={handleExportCalendar}
+                onClick={exportCalendar}
                 className="w-full bg-yellow-900 hover:bg-yellow-950 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center"
               >
                 <Calendar className="w-4 h-4 mr-2" />

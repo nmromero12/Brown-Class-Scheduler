@@ -1,4 +1,4 @@
-import { createContext, useState, useCallback } from "react";
+import { createContext, useState, useCallback, useEffect } from "react";
 import { Course, CartItem } from "./SearchCourse";
 import { ReactNode, useContext } from "react";
 
@@ -11,6 +11,8 @@ type CartContextItems = {
   addToCart: (course: CartItem) => Promise<void>;
   removeFromCart: (course: CartItem) => Promise<void>;
   initializeCart: (courses: CartItem[]) => void;
+  parseCart: (cart: CartItem[]) => Promise<void>;
+  exportCalendar: () => void;
 };
 
 const CartContext = createContext({} as CartContextItems);
@@ -21,6 +23,7 @@ export function useCart() {
 
 export function CartProvider({ children }: CartProviderProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [icsData, setIcsData] = useState<string | null>(null);
 
   const addToCart = useCallback(async (c: CartItem) => {
     if (!cartItems.find((course) => course.crn === c.crn)) {
@@ -38,9 +41,59 @@ export function CartProvider({ children }: CartProviderProps) {
     setCartItems(items);
   }, []);
 
+
+  const parseCart = useCallback(async (cart: CartItem[]) => {
+    try {
+      const parsedResponse = await fetch("http://localhost:8080/api/calendar/parse-cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cart),
+      });
+      const parsedData = await parsedResponse.json();
+
+      const icsResponse = await fetch("http://localhost:8080/api/calendar/ics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsedData),
+      });
+      const ics = await icsResponse.text();
+      setIcsData(ics);
+    } catch (error) {
+      setIcsData(null);
+      console.error("Error parsing cart:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      parseCart(cartItems);
+    } else {
+      setIcsData(null);
+    }
+  }, [cartItems, parseCart]);
+
+
+  const exportCalendar = useCallback(() => {
+    if (!icsData) {
+      alert("Calendar data not ready");
+      return;
+    }
+    const blob = new Blob([icsData], { type: "text/calendar" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "brown_schedule.ics";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }, [icsData]);
+
+  
+
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, initializeCart }}
+      value={{ cartItems, addToCart, removeFromCart, initializeCart, parseCart, exportCalendar }}
     >
       {children}
     </CartContext.Provider>
