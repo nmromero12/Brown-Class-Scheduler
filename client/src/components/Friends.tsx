@@ -273,12 +273,21 @@ export function Friends() {
       
       
       
-        {usersFound && (
-  <div className="bg-white rounded-lg border p-6 flex justify-between items-center">
-    {/* ...existing code... */}
-    <button
+        {usersFound &&(
+      <div className="bg-white rounded-lg border p-6 flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">J</div>
+          <div>
+            <h4 className="text-lg font-semibold text-gray-900">{usersFound?.email}</h4>
+            <p className="text-gray-600 text-sm">{usersFound?.email}</p>
+            <span className="mt-1 inline-block bg-brown-100 text-brown-800 text-xs px-2 py-1 rounded">CS '25</span>
+          </div>
+        </div>
+        <button
       disabled={hasSent || isAlreadyFriend(usersFound.email)}
-      onClick={() => sendFriendRequest(auth.currentUser?.uid!, usersFound.uid, auth.currentUser?.email!, usersFound.email)}
+      onClick={async () => { await sendFriendRequest(auth.currentUser?.uid!, usersFound.uid, auth.currentUser?.email!, usersFound.email);
+        setHasSent(true)
+      }}
       className={`px-4 py-2 rounded ${
         hasSent || isAlreadyFriend(usersFound.email)
           ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
@@ -291,8 +300,8 @@ export function Friends() {
         ? 'Pending'
         : 'Send Request'}
     </button>
-  </div>
-)}
+      </div>
+      )}
     </div>
     
 
