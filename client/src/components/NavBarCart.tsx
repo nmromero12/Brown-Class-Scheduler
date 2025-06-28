@@ -69,14 +69,7 @@ export default function NavBarCart() {
     }
   }
 
-  const handleExportCalendar = async () => {
-    if (!user) {
-      alert("Please sign in to export calendar");
-      return;
-    }
-    console.log("Exporting calendar for courses:", cartItems);
-    
-  };
+  
 
   return (
     <div className="relative">
