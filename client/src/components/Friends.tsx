@@ -131,6 +131,7 @@ export function Friends() {
     const [isSearching, setIsSearching] = useState(false);
     const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
     const [friends, setFriends] = useState<Friend[]>([]);
+    const [alreadyAdded, setAlreadyAdded] = useState<boolean>(false);
     
 
     // Test getUserByEmailexport type user = {
@@ -173,6 +174,8 @@ export function Friends() {
     if (user) {
       const friends = await getFriends(user)
       setFriends(friends);
+
+
     }
   }
 
@@ -186,6 +189,12 @@ export function Friends() {
       setIncomingRequests(requests);
     }
   };
+
+
+  const isAlreadyFriend = (email: string) => {
+    return friends.some(friend => friend.email == email);
+  }
+  
 
 
     useEffect(() => {
@@ -264,27 +273,26 @@ export function Friends() {
       
       
       
-        {usersFound &&(
-      <div className="bg-white rounded-lg border p-6 flex justify-between items-center">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">J</div>
-          <div>
-            <h4 className="text-lg font-semibold text-gray-900">{usersFound?.email}</h4>
-            <p className="text-gray-600 text-sm">{usersFound?.email}</p>
-            <span className="mt-1 inline-block bg-brown-100 text-brown-800 text-xs px-2 py-1 rounded">CS '25</span>
-          </div>
-        </div>
-        <button onClick={() => sendFriendRequest(auth.currentUser?.uid!, usersFound.uid, auth.currentUser?.email!, usersFound.email)}
-        className={`px-4 py-2 rounded ${
-        hasSent 
-        ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-        : 'bg-brown-600 text-white hover:bg-brown-700'
-        }`}>
-          {hasSent ? 'Pending' : 'Send Request'}
-        
-        </button>
-      </div>
-      )}
+        {usersFound && (
+  <div className="bg-white rounded-lg border p-6 flex justify-between items-center">
+    {/* ...existing code... */}
+    <button
+      disabled={hasSent || isAlreadyFriend(usersFound.email)}
+      onClick={() => sendFriendRequest(auth.currentUser?.uid!, usersFound.uid, auth.currentUser?.email!, usersFound.email)}
+      className={`px-4 py-2 rounded ${
+        hasSent || isAlreadyFriend(usersFound.email)
+          ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+          : 'bg-brown-600 text-white hover:bg-brown-700'
+      }`}
+    >
+      {isAlreadyFriend(usersFound.email)
+        ? 'Already Friends'
+        : hasSent
+        ? 'Pending'
+        : 'Send Request'}
+    </button>
+  </div>
+)}
     </div>
     
 
