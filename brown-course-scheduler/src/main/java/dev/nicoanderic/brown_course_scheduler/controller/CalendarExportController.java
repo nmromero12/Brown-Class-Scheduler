@@ -4,6 +4,7 @@ import dev.nicoanderic.brown_course_scheduler.dto.ParsedEventDto;
 import dev.nicoanderic.brown_course_scheduler.model.CartItem;
 import dev.nicoanderic.brown_course_scheduler.service.EventParserService;
 import dev.nicoanderic.brown_course_scheduler.service.IcsService;
+import java.util.Objects;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,16 @@ public class CalendarExportController {
   @PostMapping("/parse-cart")
   public ResponseEntity<List<ParsedEventDto>> parseCart(@RequestBody List<CartItem> cartItems) {
     List<ParsedEventDto> parsedList = cartItems.stream()
-        .map(eventParserService::parseClassTime)
+        .map(item -> {
+          try {
+            return eventParserService.parseClassTime(item);
+          } catch (IllegalArgumentException e) {
+            // Optional: log the bad entry
+            System.err.println("Skipping invalid CartItem: " + item.getClassTime());
+            return null; // skip this item
+          }
+        })
+        .filter(Objects::nonNull) // remove nulls
         .toList();
 
     return ResponseEntity.ok(parsedList);
