@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class IcsService {
   private static final LocalDate SEMESTER_START = LocalDate.of(2025, 9, 3);
+  private static final LocalDate SEMESTER_END = LocalDate.of(2025, 12, 12);;
 
   public String convertToIcs(List<ParsedEventDto> eventDto) {
     StringBuilder sb = new StringBuilder();
@@ -40,7 +41,11 @@ public class IcsService {
           .append("DTEND;TZID=America/New_York:")
           .append(getFirstEventDateTime(parsedEventDto.getEndTime(), classDay)).append("\n");
 
-        sb.append("RRULE:FREQ=WEEKLY;BYDAY=").append(dayStr).append("\n");
+        sb.append("RRULE:FREQ=WEEKLY;BYDAY=")
+            .append(dayStr)
+            .append(";UNTIL=")
+            .append(getSemesterEndForUntil())
+            .append("\n");
 
 
         sb.append("LOCATION:").append(escapeText(parsedEventDto.getLocation())).append("\n");
@@ -79,6 +84,12 @@ public class IcsService {
     return ZonedDateTime.now(ZoneOffset.UTC)
         .format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'"));
   }
+
+  private String getSemesterEndForUntil() {
+    DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
+    return dateFormat.format(SEMESTER_END) + "T235959Z";
+  }
+
 
 
 
