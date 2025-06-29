@@ -6,22 +6,55 @@ import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import rrulePlugin from '@fullcalendar/rrule';
 import {EventInput} from "@fullcalendar/core";
+import { useCart } from './CartContext';
+import { useState, useEffect } from 'react';
 
-const myEvents: EventInput[] = [
-  {
-    title: 'CSCI 0320 Lecture',
-    rrule: {
-      freq: 'weekly',
-      interval: 1,
-      byweekday: ['mo', 'we', 'fr'],
-      dtstart: '2025-09-01T10:30:00',
-      until: '2025-12-15',
-    },
-    duration: '01:20', // 1 hour 20 minutes
-  }
-];
+
+
+
+
+
+
+
 
 export default function CalendarView() {
+  const { parsedEvents } = useCart()
+  const [myEvents, setMyEvents] = useState<EventInput[]>([]);
+
+
+  
+
+  useEffect(() => {
+  const formatTime = (timeStr: string) => `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}`;
+  const transformed: EventInput[] = [];
+
+  for (const event of parsedEvents) {
+    if (!event.days || !event.startTime || !event.endTime || !event.description) {
+      console.warn('Skipping invalid event:', event);
+      continue;
+    }
+
+    transformed.push({
+      title: event.description,
+      rrule: {
+        freq: 'weekly',
+        byweekday: event.days,
+        until: '2025-12-12T23:59:59Z',
+      },
+      startTime: formatTime(event.startTime),
+      endTime: formatTime(event.endTime),
+      location: event.location || 'TBD',
+    });
+  }
+
+  setMyEvents(transformed);
+}, [parsedEvents]);
+
+
+
+  
+
+
   return (
     <div style={{ padding: '1rem' }}>
       <h2 className="text-2xl font-bold mb-4">Shared Course Calendar</h2>
