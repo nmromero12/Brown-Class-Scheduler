@@ -38,7 +38,6 @@ export type parsedCartItem = {
 
 export function SearchCourse() {
     const [searchCode, setSearchCode] = useState("");
-    const [department, setDepartment] = useState("");
     const [courses, setCourses] = useState<Course[] | null>(null);
     const [resultMessage, setResultMessage] = useState<string| null>(null)
     const [isLoading, setIsLoading] = useState(false);
@@ -50,13 +49,11 @@ export function SearchCourse() {
 
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setSearchCode(event.target.value);
+        const cleaned = event.target.value.replace(/\s+/g, '').toUpperCase();
+        setSearchCode(cleaned);
     };
 
 
-    const handleDepartmentChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        setDepartment(event.target.value);
-    };
 
     const handleSearch = () => {
         setSearchInput(searchCode)
@@ -154,7 +151,7 @@ export function SearchCourse() {
                 
                 {/* Search Form */}
                 <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
                         {/* Course Code Search */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -169,29 +166,7 @@ export function SearchCourse() {
                             />
                         </div>
                         
-                        {/* Department Filter */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Department (Optional)
-                            </label>
-                            <select 
-                                value={department}
-                                onChange={handleDepartmentChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brown-500 focus:border-brown-500 transition-colors"
-                            >
-                                <option value="">All Departments</option>
-                                <option value="CSCI">Computer Science</option>
-                                <option value="MATH">Mathematics</option>
-                                <option value="ANTH">Anthropology</option>
-                                <option value="ECON">Economics</option>
-                                <option value="BIOL">Biology</option>
-                                <option value="CHEM">Chemistry</option>
-                                <option value="PHYS">Physics</option>
-                                <option value="ENGL">English</option>
-                                <option value="HIST">History</option>
-                                <option value="POLS">Political Science</option>
-                            </select>
-                        </div>
+                        
                     </div>
                     
                     <button

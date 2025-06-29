@@ -36,6 +36,7 @@ public class CABService {
   public Object fetchCourseInformation() {
     Map<String, List<Map<String, Object>>> responseMap = new HashMap<>();
     responseMap.put("courses", new ArrayList<>());
+//    scraperService.scrape();
     var courses = scraperService.getCourses();
 
     HttpHeaders headers = new HttpHeaders();
@@ -59,7 +60,7 @@ public class CABService {
         );
 
       DatabaseCourse course = new DatabaseCourse();
-      course.setCourseCode(courseLoad.getCode());
+      course.setCourseCode(courseLoad.getCode().replaceAll("\\s+", ""));
       course.setCourseName(courseLoad.getTitle());
       course.setCrn(courseLoad.getCrn());
       course.setClassTime(courseLoad.getMeeting_html().replaceAll("<[^>]*>", ""));

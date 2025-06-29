@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class SeleniumConfiguration {
 //  @PostConstruct
 //  void postConstruct() {
-//    System.setProperty("webdriver.chrome.driver", "/home/nromero/chromedriver-linux64/chromedriver");
+//    System.setProperty("webdriver.chrome.driver", "/home/nromero/driver/chromedriver-linux64/chromedriver");
 //  }
   @Bean
   public ChromeDriver driver()
