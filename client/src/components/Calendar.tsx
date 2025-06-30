@@ -1,5 +1,4 @@
 // CalendarView.tsx
-import React from 'react';
 import FullCalendar  from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction'; 
@@ -8,10 +7,12 @@ import rrulePlugin from '@fullcalendar/rrule';
 import {EventInput} from "@fullcalendar/core";
 import { useCart } from './CartContext';
 import { useState, useEffect } from 'react';
-import { Friend, getFriends } from './Friends';
+import { getFriends } from '../firebase/friends';
 import { useUser } from './UserContext';
-import { parsedCartItem } from './SearchCourse';
-import { CartItem } from './SearchCourse';
+import { CartItem } from '../types/course';
+import { Friend } from '../types/friend';
+
+
 
 
 
