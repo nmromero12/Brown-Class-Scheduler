@@ -2,24 +2,9 @@ import { doc, setDoc, getDoc, updateDoc, serverTimestamp, deleteDoc, collection,
 import { db, auth } from "../main.tsx";
 import { useState, useEffect } from 'react';
 import { useUser } from './UserContext.tsx';
+import { Friend, FriendRequest, User} from '../types/friend.ts';
 
-export type FriendRequest = {
-    status: string;
-    email: string;
-    uid: string;
 
-}
-
-export type User = {
-  email: string;
-  date: Date;
-  uid: string;
-}
-
-export type Friend = {
-  email: string;
-  uid: string;
-}
 
 export async function addUser(userId: string, userData: object) {
     await setDoc(doc(db, "users", userId), userData)

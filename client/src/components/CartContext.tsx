@@ -1,5 +1,5 @@
 import { createContext, useState, useCallback, useEffect } from "react";
-import { Course, CartItem } from "./SearchCourse";
+import { Course, CartItem } from "../types/course";
 import { ReactNode, useContext } from "react";
 
 type CartProviderProps = {

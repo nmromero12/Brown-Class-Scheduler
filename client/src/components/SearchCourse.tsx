@@ -3,38 +3,10 @@ import { useState, ChangeEvent } from "react";
 import { useCart } from "./CartContext";
 import { getAuth } from "firebase/auth";
 import { Search, Plus, Clock, GraduationCap, Hash } from "lucide-react";
+import { CartItem, Course } from "../types/course";
 
 
-export type Course = {
-    id: number;
-    courseCode: string;
-    courseName: string;
-    examTime: string;
-    section: string;
-    classTime: string;
-    crn: string;
-}
 
-export type CartItem = {
-    userName: string;
-    courseCode: string;
-    courseName: string;
-    examTime: string;
-    section: string;
-    classTime: string;
-    crn: string;
-}
-
-
-export type parsedCartItem = {
-    startTime: string;
-    endTime: string;
-    days: string[];
-    location: string;
-    description: string;
-    recurrence: string;
-
-}
 
 export function SearchCourse() {
     const [searchCode, setSearchCode] = useState("");

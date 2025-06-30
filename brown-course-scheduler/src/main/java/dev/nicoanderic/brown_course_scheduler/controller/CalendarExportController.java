@@ -31,7 +31,7 @@ public class CalendarExportController {
         .map(item -> {
           try {
             return eventParserService.parseClassTime(item);
-          } catch (IllegalArgumentException e) { 
+          } catch (IllegalArgumentException e) {
             // Optional: log the bad entry
             System.err.println("Skipping invalid CartItem: " + item.getClassTime());
             return null; // skip this item
