@@ -10,7 +10,7 @@ import  SignUp  from "./components/SignUp.tsx"
 import AuthRoute from "./components/AuthRoute.tsx";
 import { getAuth, setPersistence, browserSessionPersistence } from "firebase/auth";
 import { Friends } from "./components/Friends.tsx";
-import { Calendar } from "./components/Calendar.tsx";
+import CalendarView from "./components/Calendar.tsx";
 import { getFirestore } from "firebase/firestore";
 import Layout  from "./components/Layout.tsx";
 import { UserProvider } from "./components/UserContext.tsx";
@@ -53,7 +53,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Routes>
               <Route path="/" element={<AuthRoute><Layout /></AuthRoute>}>
               <Route index element={<App />} />
-              <Route path="calendar" element={<Calendar />} />
+              <Route path="calendar" element={<CalendarView />} />
               <Route path="friends" element={<Friends />} />
             </Route>
 

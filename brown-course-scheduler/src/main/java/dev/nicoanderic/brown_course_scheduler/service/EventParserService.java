@@ -72,6 +72,13 @@ public class EventParserService {
 
       startTime = String.format("%02d%02d00", startHour, startMin);
       endTime = String.format("%02d%02d00", endHour, endMin);
+      int totalStartMinutes = startHour * 60 + startMin;
+      int totalEndMinutes = endHour * 60 + endMin;
+      int durationMinutes = totalEndMinutes - totalStartMinutes;
+
+      int durationHours = durationMinutes / 60;
+      int durationRemainderMinutes = durationMinutes % 60;
+      String duration = String.format("%02d:%02d", durationHours, durationRemainderMinutes);
 
 
       description = classDetails.getCourseName() + " " + classDetails.getSection();
@@ -89,7 +96,8 @@ public class EventParserService {
           days,
           location,
           description,
-          recurrence
+          recurrence,
+          duration
       );
     }
 

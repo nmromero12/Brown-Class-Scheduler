@@ -56,16 +56,34 @@ export default function NavBarCart() {
   }
 
   async function deleteFromCartRepository(crn: string) {
+    if (!user) {
+      console.error("Delete failed: No user ID available");
+      return;
+    }
+    
     try {
-      await fetch(`http://localhost:8080/cart/deleteItem/${crn}`, {
+      console.log("Attempting to delete item - CRN:", crn, "User ID:", user.uid);
+      const response = await fetch(`http://localhost:8080/cart/deleteItem?crn=${crn}&username=${user.uid}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      console.log("Item deleted successfully");
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Server response:", errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      console.log("Successfully deleted item - CRN:", crn, "User ID:", user.uid);
     } catch (error: any) {
-      console.log(error);
+      console.error("Error deleting item:", {
+        crn,
+        user: user.uid,
+        error: error.message,
+        stack: error.stack
+      });
     }
   }
 
@@ -116,8 +134,8 @@ export default function NavBarCart() {
                       </p>
                     </div>
                     <button
-                      onClick={() => {
-                        deleteFromCartRepository(course.crn);
+                      onClick={async () => {
+                        await deleteFromCartRepository(course.crn);
                         removeFromCart(course);
                       }}
                       className="text-red-500 hover:text-red-700 p-1"

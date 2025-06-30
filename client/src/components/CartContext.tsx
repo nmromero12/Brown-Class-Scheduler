@@ -13,6 +13,7 @@ type CartContextItems = {
   initializeCart: (courses: CartItem[]) => void;
   parseCart: (cart: CartItem[]) => Promise<void>;
   exportCalendar: () => void;
+  parsedEvents: any[];
 };
 
 const CartContext = createContext({} as CartContextItems);
@@ -24,6 +25,7 @@ export function useCart() {
 export function CartProvider({ children }: CartProviderProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [icsData, setIcsData] = useState<string | null>(null);
+  const [parsedEvents, setParsedEvents] = useState<any[]>([]);
 
   const addToCart = useCallback(async (c: CartItem) => {
     if (!cartItems.find((course) => course.crn === c.crn)) {
@@ -50,6 +52,7 @@ export function CartProvider({ children }: CartProviderProps) {
         body: JSON.stringify(cart),
       });
       const parsedData = await parsedResponse.json();
+      setParsedEvents(parsedData);
 
       const icsResponse = await fetch("http://localhost:8080/api/calendar/ics", {
         method: "POST",
@@ -93,7 +96,7 @@ export function CartProvider({ children }: CartProviderProps) {
 
   return (
     <CartContext.Provider
-      value={{ cartItems, addToCart, removeFromCart, initializeCart, parseCart, exportCalendar }}
+      value={{ cartItems, addToCart, removeFromCart, initializeCart, parseCart, exportCalendar, parsedEvents }}
     >
       {children}
     </CartContext.Provider>
