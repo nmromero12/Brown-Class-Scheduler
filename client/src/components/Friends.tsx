@@ -18,6 +18,7 @@ export type User = {
 
 export type Friend = {
   email: string;
+  uid: string;
 }
 
 export async function addUser(userId: string, userData: object) {
@@ -27,8 +28,8 @@ export async function addUser(userId: string, userData: object) {
 export async function addFriend(userId: string, friendId: string, friendEmail: string, userEmail: string) {
     const friendsRef = collection(db, "users", userId, "friends");
     const usersRef = collection(db, "users", friendId, "friends");
-    await setDoc(doc(friendsRef, friendEmail), { email: friendEmail })
-    await setDoc(doc(usersRef, userEmail), {email: userEmail})
+    await setDoc(doc(friendsRef, friendEmail), { email: friendEmail, uid: friendId })
+    await setDoc(doc(usersRef, userEmail), {email: userEmail, uid: userId})
   
 }
 
@@ -50,7 +51,8 @@ export async function getFriends(userId: string) {
   const friends: Friend[] = snapShot.docs.map((doc) => {
     const data = doc.data();
     return {
-      email: data.email
+      email: data.email,
+      uid: data.uid
     }
   })
   return friends
