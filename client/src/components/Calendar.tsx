@@ -10,11 +10,20 @@ import { useCart } from './CartContext';
 import { useState, useEffect } from 'react';
 import { Friend, getFriends } from './Friends';
 import { useUser } from './UserContext';
+import { parsedCartItem } from './SearchCourse';
+import { CartItem } from './SearchCourse';
 
 
 
 
-
+export async function fetchParsedEvents(cart: CartItem[]): Promise<any[]> {
+  const response = await fetch("http://localhost:8080/api/calendar/parse-cart", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(cart),
+  });
+  return await response.json();
+}
 
 
 
@@ -23,17 +32,27 @@ export default function CalendarView() {
   const { parsedEvents } = useCart()
   const [myEvents, setMyEvents] = useState<EventInput[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
+  const [friendEvents, setFriendEvents] = useState<EventInput[]>([]);
   const { user } = useUser();
-
 
   
 
-  useEffect(() => {
+
+  async function fetchFriendCart(friendUid: string) {
+  const response = await fetch(`http://localhost:8080/cart/user/${friendUid}`);
+  const data = await response.json();
+  if (data.result === "success") {
+    return data.items; // This should be an array of CartItem
+  }
+  return [];
+}
+
+async function setUserCalendar(e: any[]) {
   const formatTime = (timeStr: string) =>
       `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}:${timeStr.slice(4, 6)}`;
   const transformed: EventInput[] = [];
 
-  for (const event of parsedEvents) {
+  for (const event of e) {
     if (!event.days || !event.startTime || !event.endTime || !event.description) {
       console.warn('Skipping invalid event:', event);
       continue;
@@ -52,7 +71,30 @@ export default function CalendarView() {
     });
   }
 
-  setMyEvents(transformed);
+  return transformed;
+
+
+}
+
+
+async function viewFriendSchedule(friend: Friend) {
+  const cart = await fetchFriendCart(friend.uid);
+  const parsedCart = await fetchParsedEvents(cart);
+  const selectedEvents = await setUserCalendar(parsedCart);
+  setFriendEvents(selectedEvents);
+  
+}
+
+
+  
+
+  useEffect(() => {
+    async function fetchAndSetEvents() {
+      const userEvents = await setUserCalendar(parsedEvents);
+      setMyEvents(userEvents);
+    }
+
+    fetchAndSetEvents();
 }, [parsedEvents]);
 
 
@@ -83,7 +125,7 @@ export default function CalendarView() {
           center: 'title',
           right: 'timeGridWeek,timeGridDay,dayGridMonth',
         }}
-        events={myEvents}
+        events={[...myEvents, ...friendEvents]}
         height="80vh"
         nowIndicator={true}
       />
@@ -106,7 +148,7 @@ export default function CalendarView() {
               <button
                 className="ml-2 px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
                 onClick={() => {
-                  // your functionality here
+                  viewFriendSchedule(friend);
                 }}
               >
                 View
