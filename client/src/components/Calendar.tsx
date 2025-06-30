@@ -41,8 +41,8 @@ export default function CalendarView() {
         byweekday: event.days,
         until: '2025-12-12T23:59:59Z',
       },
-      startTime: formatTime(event.startTime),
-      endTime: formatTime(event.endTime),
+      startTime: '10:00:00',
+      endTime: '11:00:00',
       location: event.location || 'TBD',
     });
   }
