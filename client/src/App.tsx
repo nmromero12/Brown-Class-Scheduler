@@ -1,7 +1,7 @@
 import "./App.css";
 import Navbar from "./components/Navbar.tsx";
 import { SearchCourse } from "./components/SearchCourse.tsx";
-import { CartProvider } from "./components/CartContext.tsx";
+import { CartProvider } from "./context/CartContext.tsx";
 
 import NavBarCart from "./components/NavBarCart.tsx"
 import Cart from "./components/Cart.tsx"

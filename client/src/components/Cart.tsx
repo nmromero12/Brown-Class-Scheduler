@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useCart } from "./CartContext";
+import { useCart } from "../context/CartContext";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Calendar, Clock, GraduationCap, X } from "lucide-react";

@@ -5,10 +5,10 @@ import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import rrulePlugin from '@fullcalendar/rrule';
 import {EventInput} from "@fullcalendar/core";
-import { useCart } from './CartContext';
+import { useCart } from '../context/CartContext';
 import { useState, useEffect } from 'react';
 import { getFriends } from '../firebase/friends';
-import { useUser } from './UserContext';
+import { useUser } from '../context/UserContext';
 import { CartItem } from '../types/course';
 import { Friend } from '../types/friend';
 

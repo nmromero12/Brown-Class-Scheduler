@@ -13,8 +13,8 @@ import { Friends } from "./components/Friends.tsx";
 import CalendarView from "./components/Calendar.tsx";
 import { getFirestore } from "firebase/firestore";
 import Layout  from "./components/Layout.tsx";
-import { UserProvider } from "./components/UserContext.tsx";
-import { CartProvider } from "./components/CartContext.tsx";
+import { UserProvider } from "./context/UserContext.tsx";
+import { CartProvider } from "./context/CartContext.tsx";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,

@@ -1,6 +1,6 @@
 import { getUserByEmail, checkSentRequests, getFriends, getIncomingRequests, acceptFriendRequest, sendFriendRequest } from '../firebase/friends.ts';
 import { useState, useEffect } from 'react';
-import { useUser } from './UserContext.tsx';
+import { useUser } from '../context/UserContext.tsx';
 import { Friend, FriendRequest, User} from '../types/friend.ts';
 import { auth } from '../main.tsx';
 
