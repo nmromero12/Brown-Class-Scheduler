@@ -39,10 +39,10 @@ export default function CalendarView() {
       rrule: {
         freq: 'weekly',
         byweekday: event.days,
-        until: '2025-12-12T23:59:59Z',
+        dtstart: "2025-09-01T09:00:00",
+        until: '2025-12-12T23:59:59',
       },
-      startTime: '10:00:00',
-      endTime: '11:00:00',
+      duration: event.duration,
       location: event.location || 'TBD',
     });
   }
