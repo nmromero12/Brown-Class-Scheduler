@@ -81,7 +81,11 @@ async function viewFriendSchedule(friend: Friend) {
   const cart = await fetchFriendCart(friend.uid);
   const parsedCart = await fetchParsedEvents(cart);
   const selectedEvents = await setUserCalendar(parsedCart);
-  setFriendEvents(selectedEvents);
+  const redEvents = selectedEvents.map(ev => ({
+    ...ev,
+    color: "#ef4444"
+  }))
+  setFriendEvents(redEvents);
   
 }
 
@@ -146,7 +150,7 @@ async function viewFriendSchedule(friend: Friend) {
             >
               <span className="font-medium">{friend.email}</span>
               <button
-                className="ml-2 px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="ml-2 px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                 onClick={() => {
                   viewFriendSchedule(friend);
                 }}
