@@ -118,52 +118,55 @@ async function viewFriendSchedule(friend: Friend) {
 
 
   return (
-  <div className="flex h-screen">
-    {/* Calendar Area - Left Side */}
-    <div className="flex-grow p-4">
-      <h2 className="text-2xl font-bold mb-4">Shared Course Calendar</h2>
-      <FullCalendar
-        plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin, rrulePlugin]}
-        initialView="timeGridWeek"
-        headerToolbar={{
-          left: 'prev,next today',
-          center: 'title',
-          right: 'timeGridWeek,timeGridDay,dayGridMonth',
-        }}
-        events={[...myEvents, ...friendEvents]}
-        height="80vh"
-        nowIndicator={true}
-      />
-    </div>
+    <div className="p-6 h-[calc(100vh-5rem)]"> {/* adjust for navbar height */}
+      <div className="flex h-full rounded-2xl border border-gray-200 shadow overflow-hidden bg-white">
+        
+        {/* Calendar Section */}
+        <div className="flex-grow p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Shared Course Calendar</h2>
+          <div className="rounded-xl overflow-hidden border border-gray-300 shadow">
+            <FullCalendar
+              plugins={[timeGridPlugin, dayGridPlugin, interactionPlugin, rrulePlugin]}
+              initialView="timeGridWeek"
+              headerToolbar={{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridWeek,timeGridDay,dayGridMonth',
+              }}
+              events={[...myEvents, ...friendEvents]}
+              height="70vh"
+              nowIndicator={true}
+            />
+          </div>
+        </div>
 
-    {/* Friends Tab - Right Side */}
-    <div className="w-72 bg-gray-100 border-l border-gray-300 p-4 overflow-y-auto">
-      <h3 className="text-xl font-semibold mb-4">Friends</h3>
+        {/* Friends Panel */}
+        <div className="w-80 bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto">
+          <h3 className="text-xl font-semibold text-gray-800 mb-4">Friends</h3>
 
-      {friends.length === 0 ? (
-        <p className="text-gray-500">No friends found.</p>
-      ) : (
-        <ul className="space-y-3">
-          {friends.map(friend => (
-            <li
-              key={friend.email}
-              className="flex items-center justify-between bg-white p-3 rounded shadow hover:bg-gray-50"
-            >
-              <span className="font-medium">{friend.email}</span>
-              <button
-                className="ml-2 px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={() => {
-                  viewFriendSchedule(friend);
-                }}
-              >
-                View
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+          {friends.length === 0 ? (
+            <p className="text-gray-500">No friends found.</p>
+          ) : (
+            <ul className="space-y-4">
+              {friends.map(friend => (
+                <li
+                  key={friend.email}
+                  className="flex items-center justify-between bg-white border border-gray-200 p-4 rounded-xl shadow-sm hover:shadow-md transition"
+                >
+                  <span className="text-gray-800 font-medium truncate">{friend.email}</span>
+                  <button
+                    className="ml-2 px-3 py-1 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg"
+                    onClick={() => viewFriendSchedule(friend)}
+                  >
+                    View
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );  
 
 }
