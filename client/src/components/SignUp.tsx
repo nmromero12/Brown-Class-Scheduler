@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { addUser } from "./Friends";
+import { addUser } from "../firebase/friends";
 
+/**
+ * SignUp component for user registration.
+ * Handles user input, validation, and account creation.
+ * @returns JSX.Element
+ */
 const SignUp = () => {
     const auth = getAuth();
     const navigate = useNavigate();
@@ -13,6 +18,10 @@ const SignUp = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
 
+    /**
+     * Handles sign up with email and password.
+     * Validates password match and creates a new user.
+     */
     const signUpWithEmail = async () => {
         if (password !== confirmPassword) {
             setError("Passwords do not match");

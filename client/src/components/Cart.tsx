@@ -1,14 +1,22 @@
 import { useState, useEffect } from "react";
-import { useCart } from "./CartContext";
+import { useCart } from "../context/CartContext";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Calendar, Clock, GraduationCap, X } from "lucide-react";
 
+/**
+ * Cart component for displaying and managing the user's course schedule.
+ * Handles cart state, user authentication, and cart item management.
+ * @returns JSX.Element
+ */
 export default function Cart() {
   const { cartItems, removeFromCart, initializeCart, exportCalendar } = useCart();
   const auth = getAuth();
   const [user, setUser] = useState<any>(null);
 
+  /**
+   * Effect to update cart and user state on authentication changes.
+   */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -21,10 +29,10 @@ export default function Cart() {
     return () => unsubscribe();
   }, []);
 
-  
-
-  
-
+  /**
+   * Fetches and initializes the cart for a given user ID.
+   * @param uid - The user's unique ID.
+   */
   async function populateCartForUser(uid: string) {
     try {
       const response = await fetch(`http://localhost:8080/cart/user/${uid}`);
@@ -38,8 +46,10 @@ export default function Cart() {
     }
   }
 
-
-
+  /**
+   * Deletes a course from the backend cart repository for the current user.
+   * @param crn - The course registration number to delete.
+   */
   async function deleteFromCartRepository(crn: string) {
     if (!user) {
       console.error("Delete failed: No user ID available");

@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Login component for user authentication.
+ * Handles user input, validation, and sign-in process.
+ * @returns JSX.Element
+ */
 const Login = () => {
     const auth = getAuth();
     const navigate = useNavigate();
@@ -11,6 +16,10 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
+    /**
+     * Handles sign in with email and password.
+     * Sets loading and error states, and navigates on success.
+     */
     const signInWithEmail = async () => {
         setAuthing(true);
         setError('');

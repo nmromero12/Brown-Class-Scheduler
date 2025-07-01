@@ -1,9 +1,16 @@
-
 import { NavLink } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 import NavBarCart from "./NavBarCart";
 
+/**
+ * Navbar component for navigation and user actions.
+ * Displays navigation links, cart, and sign out button.
+ * @returns JSX.Element
+ */
 export default function Navbar() {
+  /**
+   * Signs out the current user using Firebase Auth.
+   */
   const SignOut = () => {
     const auth = getAuth();
     signOut(auth).then(() => {
