@@ -148,13 +148,13 @@ export default function CalendarView() {
         </div>
 
         {/* Friends Panel */}
-        <div className="w-80 bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto">
+        <div className="w-80 bg-gray-50 border-l border-gray-200 p-6 overflow-y-auto flex flex-col h-full">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">Friends</h3>
 
           {friends.length === 0 ? (
-            <p className="text-gray-500">No friends found.</p>
+            <p className="text-gray-500 flex-1">No friends found.</p>
           ) : (
-            <ul className="space-y-4">
+            <ul className="space-y-4 flex-1">
               {friends.map(friend => (
                 <li
                   key={friend.email}
@@ -171,6 +171,13 @@ export default function CalendarView() {
               ))}
             </ul>
           )}
+
+          <button
+            className="mt-6 px-3 py-2 text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg w-full"
+            onClick={() => setFriendEvents([])}
+          >
+            Clear
+          </button>
         </div>
       </div>
     </div>

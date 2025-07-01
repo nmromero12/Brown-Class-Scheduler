@@ -40,7 +40,7 @@ export function Friends() {
           setUsersFound(foundUser);
 
           if (user) {
-            const alreadySent = await checkSentRequests(user.uid, user.uid); 
+            const alreadySent = await checkSentRequests(user.uid, userDoc.uid); 
             setHasSent(alreadySent);
           }
         } else {
