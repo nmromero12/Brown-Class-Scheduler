@@ -3,6 +3,11 @@ import { useCart } from "../context/CartContext";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { X, Calendar } from "lucide-react";
 
+/**
+ * NavBarCart component displays the user's cart in a dropdown.
+ * Handles cart state, user authentication, and cart item management.
+ * @returns JSX.Element
+ */
 export default function NavBarCart() {
   const [showCart, setShowCart] = useState(false);
   const { cartItems, removeFromCart, initializeCart, exportCalendar } = useCart();
@@ -12,8 +17,14 @@ export default function NavBarCart() {
   const cartRef = useRef<HTMLDivElement | null>(null);
   const cartIconRef = useRef<HTMLImageElement | null>(null);
 
+  /**
+   * Toggles the visibility of the cart dropdown.
+   */
   const toggleCart = () => setShowCart((prev) => !prev);
 
+  /**
+   * Effect to populate or clear the cart when authentication state changes.
+   */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
@@ -25,6 +36,9 @@ export default function NavBarCart() {
     return () => unsubscribe();
   }, []);
 
+  /**
+   * Effect to close the cart dropdown when clicking outside of it.
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -43,6 +57,10 @@ export default function NavBarCart() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showCart]);
 
+  /**
+   * Fetches and initializes the cart for a given user ID.
+   * @param uid - The user's unique ID.
+   */
   async function populateCartForUser(uid: string) {
     try {
       const response = await fetch(`http://localhost:8080/cart/user/${uid}`);
@@ -55,6 +73,10 @@ export default function NavBarCart() {
     }
   }
 
+  /**
+   * Deletes a course from the backend cart repository for the current user.
+   * @param crn - The course registration number to delete.
+   */
   async function deleteFromCartRepository(crn: string) {
     if (!user) {
       console.error("Delete failed: No user ID available");
@@ -86,8 +108,6 @@ export default function NavBarCart() {
       });
     }
   }
-
-  
 
   return (
     <div className="relative">

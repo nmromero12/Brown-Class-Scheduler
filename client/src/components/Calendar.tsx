@@ -12,11 +12,11 @@ import { useUser } from '../context/UserContext';
 import { CartItem } from '../types/course';
 import { Friend } from '../types/friend';
 
-
-
-
-
-
+/**
+ * Fetches parsed calendar events from the backend for a given cart.
+ * @param cart - Array of CartItem objects.
+ * @returns Promise resolving to an array of parsed event objects.
+ */
 export async function fetchParsedEvents(cart: CartItem[]): Promise<any[]> {
   const response = await fetch("http://localhost:8080/api/calendar/parse-cart", {
     method: "POST",
@@ -26,9 +26,11 @@ export async function fetchParsedEvents(cart: CartItem[]): Promise<any[]> {
   return await response.json();
 }
 
-
-
-
+/**
+ * CalendarView component displays the user's and friends' course schedules.
+ * Allows viewing friends' schedules on the calendar.
+ * @returns JSX.Element
+ */
 export default function CalendarView() {
   const { parsedEvents } = useCart()
   const [myEvents, setMyEvents] = useState<EventInput[]>([]);
@@ -36,63 +38,70 @@ export default function CalendarView() {
   const [friendEvents, setFriendEvents] = useState<EventInput[]>([]);
   const { user } = useUser();
 
-  
-
-
+  /**
+   * Fetches the cart for a friend by UID.
+   * @param friendUid - The friend's user ID.
+   * @returns Promise resolving to an array of CartItem.
+   */
   async function fetchFriendCart(friendUid: string) {
-  const response = await fetch(`http://localhost:8080/cart/user/${friendUid}`);
-  const data = await response.json();
-  if (data.result === "success") {
-    return data.items; // This should be an array of CartItem
+    const response = await fetch(`http://localhost:8080/cart/user/${friendUid}`);
+    const data = await response.json();
+    if (data.result === "success") {
+      return data.items; // This should be an array of CartItem
+    }
+    return [];
   }
-  return [];
-}
 
-async function setUserCalendar(e: any[]) {
-  const formatTime = (timeStr: string) =>
-      `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}:${timeStr.slice(4, 6)}`;
-  const transformed: EventInput[] = [];
+  /**
+   * Converts parsed event data into FullCalendar EventInput objects.
+   * @param e - Array of parsed event objects.
+   * @returns Promise resolving to an array of EventInput.
+   */
+  async function setUserCalendar(e: any[]) {
+    const formatTime = (timeStr: string) =>
+        `${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}:${timeStr.slice(4, 6)}`;
+    const transformed: EventInput[] = [];
 
-  for (const event of e) {
-    if (!event.days || !event.startTime || !event.endTime || !event.description) {
-      console.warn('Skipping invalid event:', event);
-      continue;
+    for (const event of e) {
+      if (!event.days || !event.startTime || !event.endTime || !event.description) {
+        console.warn('Skipping invalid event:', event);
+        continue;
+      }
+
+      transformed.push({
+        title: event.description,
+        rrule: {
+          freq: 'weekly',
+          byweekday: event.days,
+          dtstart: `2025-09-03T${formatTime(event.startTime)}`,
+          until: '2025-12-12T23:59:59',
+        },
+        duration: event.duration,
+        location: event.location || 'TBD',
+      });
     }
 
-    transformed.push({
-      title: event.description,
-      rrule: {
-        freq: 'weekly',
-        byweekday: event.days,
-        dtstart: `2025-09-03T${formatTime(event.startTime)}`,
-        until: '2025-12-12T23:59:59',
-      },
-      duration: event.duration,
-      location: event.location || 'TBD',
-    });
+    return transformed;
   }
 
-  return transformed;
+  /**
+   * Loads and displays a friend's schedule on the calendar.
+   * @param friend - The friend whose schedule to view.
+   */
+  async function viewFriendSchedule(friend: Friend) {
+    const cart = await fetchFriendCart(friend.uid);
+    const parsedCart = await fetchParsedEvents(cart);
+    const selectedEvents = await setUserCalendar(parsedCart);
+    const redEvents = selectedEvents.map(ev => ({
+      ...ev,
+      color: "#ef4444"
+    }))
+    setFriendEvents(redEvents);
+  }
 
-
-}
-
-
-async function viewFriendSchedule(friend: Friend) {
-  const cart = await fetchFriendCart(friend.uid);
-  const parsedCart = await fetchParsedEvents(cart);
-  const selectedEvents = await setUserCalendar(parsedCart);
-  const redEvents = selectedEvents.map(ev => ({
-    ...ev,
-    color: "#ef4444"
-  }))
-  setFriendEvents(redEvents);
-  
-}
-
-
-  
-
+  /**
+   * Effect to update the user's events when parsedEvents changes.
+   */
   useEffect(() => {
     async function fetchAndSetEvents() {
       const userEvents = await setUserCalendar(parsedEvents);
@@ -100,19 +109,17 @@ async function viewFriendSchedule(friend: Friend) {
     }
 
     fetchAndSetEvents();
-}, [parsedEvents]);
+  }, [parsedEvents]);
 
-
-
-
+  /**
+   * Effect to fetch friends when the user is available.
+   */
   useEffect(() => {
     // Fetch friends when user is available
     if (user) {
       getFriends(user.uid).then(setFriends);
     }
   }, [user]);
-
-
 
   
 

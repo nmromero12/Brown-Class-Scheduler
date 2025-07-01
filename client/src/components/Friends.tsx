@@ -4,9 +4,11 @@ import { useUser } from '../context/UserContext.tsx';
 import { Friend, FriendRequest, User} from '../types/friend.ts';
 import { auth } from '../main.tsx';
 
-
-
-
+/**
+ * Friends component for managing friend search, requests, and friend list.
+ * Handles searching users, sending/accepting/declining requests, and removing friends.
+ * @returns JSX.Element
+ */
 export function Friends() {
     const [userSearch, setUserSearch] = useState("");
     const [hasSent, setHasSent] = useState<boolean>(false);
@@ -18,11 +20,11 @@ export function Friends() {
     const [friends, setFriends] = useState<Friend[]>([]);
     const [acceptedRequests, setAcceptedRequests] = useState<string[]>([]);
     const { user } = useUser();
-    
 
-    // Test getUserByEmailexport type user = {
-  
-
+    /**
+     * Handles searching for a user by email.
+     * Updates found user and sent request state.
+     */
     const handleSearch = async () => {
       try {
         setIsSearching(true);
@@ -40,54 +42,56 @@ export function Friends() {
           if (user) {
             const alreadySent = await checkSentRequests(user.uid, user.uid); 
             setHasSent(alreadySent);
-      }
-        } 
-
-
-          
-          else {
+          }
+        } else {
           setUsersFound(null);
           setHasSent(false);
-        }} finally {
-          setIsSearching(false);
         }
-         
+      } finally {
+        setIsSearching(false);
+      }
     };
 
-
+    /**
+     * Fetches and sets the current user's friends.
+     */
     const findFriends = async () => {
-    
-    if (user) {
-      const friends = await getFriends(user.uid)
-      setFriends(friends);
-
-
+      if (user) {
+        const friends = await getFriends(user.uid)
+        setFriends(friends);
+      }
     }
-  }
 
-    
-
-
+    /**
+     * Fetches and sets incoming friend requests for the current user.
+     */
     const fetchRequests = async () => {
-    
-    if (user) {
-      const requests = await getIncomingRequests(user.uid);
-      setIncomingRequests(requests);
+      if (user) {
+        const requests = await getIncomingRequests(user.uid);
+        setIncomingRequests(requests);
+      }
+    };
+
+    /**
+     * Checks if a given email is already a friend.
+     * @param email - The email to check.
+     * @returns True if already a friend, false otherwise.
+     */
+    const isAlreadyFriend = (email: string) => {
+      return friends.some(friend => friend.email == email);
     }
-  };
 
-
-  const isAlreadyFriend = (email: string) => {
-    return friends.some(friend => friend.email == email);
-  }
-  
-
-
+    /**
+     * Effect to fetch requests and friends on mount.
+     */
     useEffect(() => {
       fetchRequests();
       findFriends();
     },[])
 
+    /**
+     * Effect to reset search state when switching screens.
+     */
     useEffect(() => {
         if (activeScreen === 'requests') {
             setEntrance(true);

@@ -1,13 +1,13 @@
-
 import { useState, ChangeEvent } from "react";
 import { useCart } from "../context/CartContext";
 import { getAuth } from "firebase/auth";
 import { Search, Plus, Clock, GraduationCap, Hash } from "lucide-react";
 import { CartItem, Course } from "../types/course";
 
-
-
-
+/**
+ * SearchCourse component for searching and adding courses to the cart.
+ * @returns JSX.Element
+ */
 export function SearchCourse() {
     const [searchCode, setSearchCode] = useState("");
     const [courses, setCourses] = useState<Course[] | null>(null);
@@ -20,18 +20,27 @@ export function SearchCourse() {
     const user = auth.currentUser;
 
 
+    /**
+     * Handles input change for the course code search field.
+     * Cleans and formats the input.
+     * @param event - The input change event.
+     */
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         const cleaned = event.target.value.replace(/\s+/g, '').toUpperCase();
         setSearchCode(cleaned);
     };
 
-
-
+    /**
+     * Sets the search input state to the current search code.
+     */
     const handleSearch = () => {
         setSearchInput(searchCode)
     }
 
-
+    /**
+     * Fetches courses from the backend based on the search code.
+     * Handles loading, error, and result states.
+     */
     async function fetchCourses() {
         if (!searchCode.trim()) {
             setResultMessage("Please enter a course code");
@@ -63,6 +72,10 @@ export function SearchCourse() {
         }
     }
 
+    /**
+     * Adds a course item to the backend cart repository.
+     * @param cartItem - The cart item to add.
+     */
     async function addtoCartRepository(cartItem: CartItem) {
         try {
             const response = await fetch('http://localhost:8080/cart/addToCart', {
@@ -83,6 +96,11 @@ export function SearchCourse() {
         }
     }
 
+    /**
+     * Handles adding a course to the cart and repository.
+     * Checks if the user is logged in.
+     * @param course - The course to add.
+     */
     const handleAddToCart = (course: Course) => {
         if (!user) {
             alert("You need to be logged in first");
@@ -105,6 +123,9 @@ export function SearchCourse() {
         addToCart(cartItem);
     };
 
+    /**
+     * Clears the search results and resets related state.
+     */
     const clearSearch = () => {
         setCourses(null);
         setResultMessage("");
