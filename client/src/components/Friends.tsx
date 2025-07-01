@@ -1,4 +1,4 @@
-import { getUserByEmail, checkSentRequests, getFriends, getIncomingRequests, acceptFriendRequest, sendFriendRequest } from '../firebase/friends.ts';
+import { getUserByEmail, checkSentRequests, getFriends, getIncomingRequests, acceptFriendRequest, sendFriendRequest, declineFriendRequest, removeFriend } from '../firebase/friends.ts';
 import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext.tsx';
 import { Friend, FriendRequest, User} from '../types/friend.ts';
@@ -165,8 +165,6 @@ export function Friends() {
           <div className="w-12 h-12 bg-brown-600 rounded-full flex items-center justify-center text-white font-semibold">J</div>
           <div>
             <h4 className="text-lg font-semibold text-gray-900">{usersFound?.email}</h4>
-            <p className="text-gray-600 text-sm">{usersFound?.email}</p>
-            <span className="mt-1 inline-block bg-brown-100 text-brown-800 text-xs px-2 py-1 rounded">CS '25</span>
           </div>
         </div>
         <button
@@ -234,7 +232,13 @@ export function Friends() {
                 disabled={acceptedRequests.includes(request.uid)}>
                 Accept Request
               </button>
-              <button className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">
+              <button onClick = {async() => {
+                const curUser = auth.currentUser
+                if (curUser) {
+                  await declineFriendRequest(curUser.uid, request.uid)
+                  setIncomingRequests(prev => prev.filter(r => r.uid != request.uid))
+                }
+              }}className="bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700">
                 Decline
               </button>
             </div>
@@ -275,8 +279,13 @@ export function Friends() {
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <button className="text-brown-600 hover:text-brown-800" title="View Schedule">📅</button>
-                <button className="text-red-600 hover:text-red-800" title="Remove Friend">🗑️</button>
+                <button onClick={async () => {
+                  const curUser = auth.currentUser
+                  if (curUser) {
+                  await removeFriend(curUser.uid, friend.uid, curUser.email!, friend.email)
+                  setFriends(prev => prev.filter(r => r.uid != friend.uid))
+                }
+                }}className="text-red-600 hover:text-red-800" title="Remove Friend">🗑️</button>
               </div>
             </div>
           ))

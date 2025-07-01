@@ -9,8 +9,9 @@ export async function addUser(userId: string, userData: object) {
 export async function addFriend(userId: string, friendId: string, friendEmail: string, userEmail: string) {
     const friendsRef = collection(db, "users", userId, "friends");
     const usersRef = collection(db, "users", friendId, "friends");
-    await setDoc(doc(friendsRef, friendEmail), { email: friendEmail, uid: friendId })
-    await setDoc(doc(usersRef, userEmail), {email: userEmail, uid: userId})
+    await setDoc(doc(friendsRef, friendId), { email: friendEmail, uid: friendId })
+    await setDoc(doc(usersRef, userId), { email: userEmail, uid: userId })
+
   
 }
 
@@ -70,10 +71,6 @@ export async function getIncomingRequests(userId: string) {
   
 
 
-// export async function findSentFriendRequests(senderEmail: string) {
-//   const requestsRef = collection(db, "users", user)
-  
-// }
 
 export async function acceptFriendRequest(userId: string, friendId: string, friendEmail: string, userEmail: string) {
     await addFriend(userId, friendId, friendEmail, userEmail);
@@ -81,6 +78,21 @@ export async function acceptFriendRequest(userId: string, friendId: string, frie
     await deleteDoc(doc(db, "users", userId, "incomingRequests", friendId));
     await deleteDoc(doc(db, "users", friendId, "outgoingRequests", userId));
 
+}
+
+export async function declineFriendRequest(userId: string, friendId: string) {
+    await deleteDoc(doc(db, "users", userId, "incomingRequests", friendId));
+    await deleteDoc(doc(db, "users", friendId, "outgoingRequests", userId));
+
+}
+
+
+export async function removeFriend(userId: string, friendId: string, friendEmail: string, userEmail:string) {
+    const friendsRef = collection(db, "users", userId, "friends");
+    const usersRef = collection(db, "users", friendId, "friends");
+    await deleteDoc(doc(friendsRef, friendId))
+    await deleteDoc(doc(usersRef, userId))
+  
 }
 
 
