@@ -22,8 +22,14 @@ public class EventParserService {
   public ParsedEventDto parseClassTime(CartItem classDetails) {
     String classTime = classDetails.getClassTime();
 
+    // Defensive check: ensure classTime contains a space separating days and times
+    int spaceIndex = classTime.indexOf(" ");
+    if (spaceIndex == -1) {
+      throw new IllegalArgumentException("Invalid classTime format, missing space separator: " + classTime);
+    }
+
     // Parse Days
-    String classDays = classTime.substring(0, classTime.indexOf(" "));
+    String classDays = classTime.substring(0, spaceIndex);
     List<String> days = new ArrayList<>();
 
     int i = 0;
