@@ -61,7 +61,7 @@ public class IcsService {
     return sb.toString();
   }
 
-  private String getFirstEventDateTime(String time, DayOfWeek classDay) {
+  String getFirstEventDateTime(String time, DayOfWeek classDay) {
     // Find first date on or after semester start that matches class day
     LocalDate firstClassDate = SEMESTER_START;
     while (firstClassDate.getDayOfWeek() != classDay) {
