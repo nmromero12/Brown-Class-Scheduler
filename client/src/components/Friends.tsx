@@ -115,9 +115,31 @@ export function Friends() {
 
 
     <div className="bg-white border border-gray-200 p-1 inline-flex rounded-md mb-6">
-        <button onClick={() => setActiveScreen('search')} className="px-4 py-2 text-white bg-brown-600 rounded-l">Search Friends</button>
-        <button onClick={() => setActiveScreen('requests')} className="px-4 py-2">Friend Requests <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">{incomingRequests.length}</span></button>
-        <button onClick={() => setActiveScreen('friends')} className="px-4 py-2 rounded-r">My Friends <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">{friends.length}</span></button>
+        <button  onClick={() => setActiveScreen('search')}
+    className={`px-4 py-2 rounded-l ${
+      activeScreen === 'search'
+        ? 'bg-brown-600 text-white'
+        : 'text-gray-800 hover:bg-gray-100'
+    }`}>Search Friends
+    </button>
+        <button  onClick={() => setActiveScreen('requests')}
+    className={`px-4 py-2 ${
+      activeScreen === 'requests'
+        ? 'bg-brown-600 text-white'
+        : 'text-gray-800 hover:bg-gray-100'
+    }`}>Friend Requests 
+    <span className="ml-2 bg-red-600 text-white px-2 py-1 rounded text-xs">
+      {incomingRequests.length}
+      </span>
+    </button>
+        <button onClick={() => setActiveScreen('friends')}
+    className={`px-4 py-2 rounded-r ${
+      activeScreen === 'friends'
+        ? 'bg-brown-600 text-white'
+        : 'text-gray-800 hover:bg-gray-100'
+    }`}>
+      My Friends 
+      <span className="ml-2 bg-brown-100 text-brown-800 px-2 py-1 rounded text-xs">{friends.length}</span></button>
     </div>
 
     
