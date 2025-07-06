@@ -153,7 +153,9 @@ async function fetchParsedEvents(cart: CartItem[]): Promise<any[]> {
                 right: 'timeGridWeek,timeGridDay,dayGridMonth',
               }}
               events={[...myEvents, ...friendEvents]}
-              height="70vh"
+              height="auto"
+              contentHeight="auto"
+              expandRows={true}
               nowIndicator={true}
             />
           </div>
