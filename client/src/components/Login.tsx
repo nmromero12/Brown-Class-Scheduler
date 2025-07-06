@@ -37,27 +37,31 @@ const Login = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-red-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-brown-50 via-white to-brown-100 flex items-center justify-center p-4"
+            style={{
+  background: 'linear-gradient(135deg, rgb(190, 137, 84) 0%, rgb(243, 216, 216) 60%, rgb(190, 137, 85) 100%)',
+}}
+>
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-red-800 rounded-full mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-brown-700 rounded-full mb-4">
                         <span className="text-white font-bold text-xl">B</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-red-900 mb-2">
+                    <h1 className="text-3xl font-bold text-brown-800 mb-2">
                         Welcome to Brown Class Scheduler
                     </h1>
-                    <p className="text-red-700">
+                    <p className="text-brown-600">
                         Login or Sign up to get Started
                     </p>
                 </div>
 
                 {/* Login Form */}
-                <div className="bg-white rounded-2xl shadow-xl border border-red-100 p-8">
+                <div className="bg-white rounded-2xl shadow-xl border border-brown-100 p-8">
                     <form onSubmit={(e) => { e.preventDefault(); signInWithEmail(); }} className="space-y-6">
                         {/* Email Input */}
                         <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-red-900 mb-2">
+                            <label htmlFor="email" className="block text-sm font-semibold text-brown-800 mb-2">
                                 Email Address
                             </label>
                             <input
@@ -65,7 +69,7 @@ const Login = () => {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full px-4 py-3 border-2 border-red-200 rounded-xl focus:border-red-500 focus:ring-2 focus:ring-red-200 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
+                                className="w-full px-4 py-3 border-2 border-brown-200 rounded-xl focus:border-brown-500 focus:ring-2 focus:ring-brown-200 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
                                 placeholder="Enter Your Email"
                                 required
                             />
@@ -73,7 +77,7 @@ const Login = () => {
 
                         {/* Password Input */}
                         <div>
-                            <label htmlFor="password" className="block text-sm font-semibold text-red-900 mb-2">
+                            <label htmlFor="password" className="block text-sm font-semibold text-brown-800 mb-2">
                                 Password
                             </label>
                             <input
@@ -81,7 +85,7 @@ const Login = () => {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full px-4 py-3 border-2 border-red-200 rounded-xl focus:border-red-500 focus:ring-2 focus:ring-red-200 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
+                                className="w-full px-4 py-3 border-2 border-brown-200 rounded-xl focus:border-brown-500 focus:ring-2 focus:ring-brown-200 focus:outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
                                 placeholder="Enter your password"
                                 required
                             />
@@ -89,7 +93,7 @@ const Login = () => {
 
                         {/* Error Message */}
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                            <div className="bg-brown-50 border border-brown-200 text-brown-700 px-4 py-3 rounded-xl text-sm">
                                 {error}
                             </div>
                         )}
@@ -98,7 +102,7 @@ const Login = () => {
                         <button
                             type="submit"
                             disabled={authing}
-                            className="w-full bg-gradient-to-r from-red-800 to-red-900 hover:from-red-900 hover:to-red-950 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            className="w-full bg-gradient-to-r from-brown-700 to-brown-800 hover:from-brown-800 hover:to-brown-900 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                         >
                             {authing ? (
                                 <div className="flex items-center justify-center">
@@ -113,12 +117,12 @@ const Login = () => {
 
                     {/* Footer Links */}
                     <div className="mt-8 text-center space-y-2">
-                        <a href="#" className="text-red-600 hover:text-red-800 text-sm font-medium transition-colors">
+                        <a href="#" className="text-brown-800 hover:text-red-800 text-sm font-medium transition-colors">
                             Forgot your password?
                         </a>
-                        <div className="text-sm text-red-600">
+                        <div className="text-sm text-brown-600">
                             Don't have an account? {' '}
-                            <a href="/signup" className="font-semibold hover:text-red-800 transition-colors">
+                            <a href="/signup" className="font-semibold hover:text-brown-800 transition-colors">
                                 Sign up here
                             </a>
                         </div>
@@ -126,7 +130,7 @@ const Login = () => {
                 </div>
 
                 {/* University Notice */}
-                <div className="mt-6 text-center text-xs text-red-600">
+                <div className="mt-6 text-center text-xs text-brown-600">
                     <p>Intended for Brown University students</p>
                 </div>
             </div>
