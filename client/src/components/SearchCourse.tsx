@@ -1,7 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import { useCart } from "../context/CartContext";
 import { getAuth } from "firebase/auth";
-import { Search, Plus, Clock, GraduationCap, Hash } from "lucide-react";
+import { Search, Plus, Clock, GraduationCap, Hash, Currency } from "lucide-react";
 import { CartItem, Course } from "../types/course";
 
 /**
@@ -18,6 +18,7 @@ export function SearchCourse() {
     const [searchInput, setSearchInput] = useState("");
     const auth = getAuth();
     const user = auth.currentUser;
+    
 
 
     /**
@@ -52,9 +53,16 @@ export function SearchCourse() {
         setIsLoading(true);
         setCourses(null);
         setResultMessage("");
+        const idToken = await user?.getIdToken()
+        
         
         try {
-            const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`);
+            const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      })
             const data = await response.json();
             
             if (data.result === "success") {
@@ -67,6 +75,7 @@ export function SearchCourse() {
             }
         } catch (error: any) {
             setResultMessage("Sorry connection to server failed");
+            console.log(error)
         } finally {
             setIsLoading(false);
         }
@@ -78,9 +87,12 @@ export function SearchCourse() {
      */
     async function addtoCartRepository(cartItem: CartItem) {
         try {
+
+            const idToken = await user?.getIdToken()
             const response = await fetch('http://localhost:8080/cart/addToCart', {
                 method: "POST",
                 headers: {
+                    Authorization: `Bearer ${idToken}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(cartItem)
@@ -96,6 +108,7 @@ export function SearchCourse() {
         }
     }
 
+    
     /**
      * Handles adding a course to the cart and repository.
      * Checks if the user is logged in.

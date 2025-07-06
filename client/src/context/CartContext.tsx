@@ -1,6 +1,7 @@
 import { createContext, useState, useCallback, useEffect } from "react";
 import { Course, CartItem } from "../types/course";
 import { ReactNode, useContext } from "react";
+import { getAuth } from "firebase/auth";
 
 type CartProviderProps = {
   children: ReactNode;
@@ -18,70 +19,112 @@ type CartContextItems = {
 
 const CartContext = createContext({} as CartContextItems);
 
-/**
- * Custom hook to access the cart context.
- * @returns The cart context value.
- */
 export function useCart() {
   return useContext(CartContext);
 }
 
-/**
- * Provides cart state and actions to its children.
- * @param children - React child nodes.
- */
 export function CartProvider({ children }: CartProviderProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [icsData, setIcsData] = useState<string | null>(null);
   const [parsedEvents, setParsedEvents] = useState<any[]>([]);
 
-  /**
-   * Adds a course to the cart if it is not already present.
-   * @param c - The course item to add.
-   */
   const addToCart = useCallback(async (c: CartItem) => {
     if (!cartItems.find((course) => course.crn === c.crn)) {
-      setCartItems((courses) => [...courses, c]);
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        if (!user) throw new Error("User not authenticated");
+
+        const idToken = await user.getIdToken();
+
+        const response = await fetch('http://localhost:8080/cart/addToCart', {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(c),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to add item to cart backend");
+        }
+
+        setCartItems((courses) => [...courses, c]);
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+      }
     }
   }, [cartItems]);
 
-  /**
-   * Removes a course from the cart.
-   * @param course - The course item to remove.
-   */
   const removeFromCart = useCallback(async (course: CartItem) => {
-    setCartItems((currItems) => {
-      return currItems.filter((items) => items.crn !== course.crn);
-    });
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated");
+
+      const idToken = await user.getIdToken();
+
+      const response = await fetch('http://localhost:8080/cart/removeFromCart', {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(course),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to remove item from cart backend");
+      }
+
+      setCartItems((currItems) => currItems.filter((items) => items.crn !== course.crn));
+    } catch (error) {
+      console.error("Error removing from cart:", error);
+    }
   }, []);
 
-  /**
-   * Initializes the cart with a given list of items.
-   * @param items - The initial cart items.
-   */
   const initializeCart = useCallback((items: CartItem[]) => {
     setCartItems(items);
   }, []);
 
-  /**
-   * Parses the cart items to generate calendar events and ICS data.
-   * @param cart - The cart items to parse.
-   */
   const parseCart = useCallback(async (cart: CartItem[]) => {
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) throw new Error("User not authenticated");
+
+      const idToken = await user.getIdToken();
+
       const parsedResponse = await fetch("http://localhost:8080/api/calendar/parse-cart", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(cart),
       });
+
+      if (!parsedResponse.ok) {
+        throw new Error("Failed to parse cart");
+      }
+
       const parsedData = await parsedResponse.json();
       setParsedEvents(parsedData);
 
       const icsResponse = await fetch("http://localhost:8080/api/calendar/ics", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(parsedData),
       });
+
+      if (!icsResponse.ok) {
+        throw new Error("Failed to generate ICS");
+      }
+
       const ics = await icsResponse.text();
       setIcsData(ics);
     } catch (error) {
@@ -90,9 +133,6 @@ export function CartProvider({ children }: CartProviderProps) {
     }
   }, []);
 
-  /**
-   * Effect to parse cart whenever cartItems changes.
-   */
   useEffect(() => {
     if (cartItems.length > 0) {
       parseCart(cartItems);
@@ -101,9 +141,6 @@ export function CartProvider({ children }: CartProviderProps) {
     }
   }, [cartItems, parseCart]);
 
-  /**
-   * Exports the current calendar as an ICS file.
-   */
   const exportCalendar = useCallback(() => {
     if (!icsData) {
       alert("Calendar data not ready");
@@ -128,6 +165,3 @@ export function CartProvider({ children }: CartProviderProps) {
     </CartContext.Provider>
   );
 }
-
-
-

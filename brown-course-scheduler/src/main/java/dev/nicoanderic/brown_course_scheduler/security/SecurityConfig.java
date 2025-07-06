@@ -27,6 +27,7 @@ public class SecurityConfig {
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/cart/**").authenticated()
+            .requestMatchers("/api/**").authenticated()
             .anyRequest().permitAll()
         )
         .addFilterBefore(firebaseAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -12,19 +12,7 @@ import { useUser } from '../context/UserContext';
 import { CartItem } from '../types/course';
 import { Friend } from '../types/friend';
 
-/**
- * Fetches parsed calendar events from the backend for a given cart.
- * @param cart - Array of CartItem objects.
- * @returns Promise resolving to an array of parsed event objects.
- */
-export async function fetchParsedEvents(cart: CartItem[]): Promise<any[]> {
-  const response = await fetch("http://localhost:8080/api/calendar/parse-cart", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(cart),
-  });
-  return await response.json();
-}
+
 
 /**
  * CalendarView component displays the user's and friends' course schedules.
@@ -38,13 +26,37 @@ export default function CalendarView() {
   const [friendEvents, setFriendEvents] = useState<EventInput[]>([]);
   const { user } = useUser();
 
+
+  /**
+ * Fetches parsed calendar events from the backend for a given cart.
+ * @param cart - Array of CartItem objects.
+ * @returns Promise resolving to an array of parsed event objects.
+ */
+async function fetchParsedEvents(cart: CartItem[]): Promise<any[]> {
+  const idToken = await user?.getIdToken()
+  const response = await fetch("http://localhost:8080/api/calendar/parse-cart", {
+    method: "POST",
+    headers: { 
+      Authorization: `Bearer ${idToken}`,
+      "Content-Type": "application/json" },
+    body: JSON.stringify(cart),
+  });
+  return await response.json();
+}
+
   /**
    * Fetches the cart for a friend by UID.
    * @param friendUid - The friend's user ID.
    * @returns Promise resolving to an array of CartItem.
    */
   async function fetchFriendCart(friendUid: string) {
-    const response = await fetch(`http://localhost:8080/cart/user/${friendUid}`);
+    const idToken = await user?.getIdToken()
+    const response = await fetch(`http://localhost:8080/cart/user/${friendUid}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      })
     const data = await response.json();
     if (data.result === "success") {
       return data.items; // This should be an array of CartItem
