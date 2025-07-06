@@ -30,8 +30,6 @@ public class CartController {
   @GetMapping("/user/{userId}")
   public Object getCartItem(@PathVariable String userId) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    System.out.println("Authenticated user: " + auth.getName());
-    System.out.println("Requested userId: " + userId);
 
     return cartService.getCartItems(userId);
   }
