@@ -18,10 +18,10 @@ export default function Cart() {
    * Effect to update cart and user state on authentication changes.
    */
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        populateCartForUser(currentUser.uid);
+        await populateCartForUser(currentUser);
       } else {
         initializeCart([]);
       }
@@ -30,24 +30,36 @@ export default function Cart() {
   }, []);
 
   /**
-   * Fetches and initializes the cart for a given user ID.
-   * @param uid - The user's unique ID.
+   * Fetches and initializes the cart for the authenticated user with Firebase ID token.
+   * @param currentUser - The authenticated Firebase user.
    */
-  async function populateCartForUser(uid: string) {
+  async function populateCartForUser(currentUser: any) {
     try {
-      const response = await fetch(`http://localhost:8080/cart/user/${uid}`);
+      const idToken = await currentUser.getIdToken();
+      const response = await fetch(`http://localhost:8080/cart/user/${currentUser.uid}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       if (data.result === "success") {
         initializeCart(data.items);
+      } else {
+        console.error("Failed to populate cart:", data);
       }
     } catch (error: any) {
-      console.log(error);
-
+      console.error("Error populating cart:", error);
     }
   }
 
   /**
-   * Deletes a course from the backend cart repository for the current user.
+   * Deletes a course from the backend cart repository for the current user, including Firebase token.
    * @param crn - The course registration number to delete.
    */
   async function deleteFromCartRepository(crn: string) {
@@ -57,10 +69,11 @@ export default function Cart() {
     }
     
     try {
-      console.log("Attempting to delete item - CRN:", crn, "User ID:", user.uid);
+      const idToken = await user.getIdToken();
       const response = await fetch(`http://localhost:8080/cart/deleteItem?crn=${crn}&username=${user.uid}`, {
         method: "DELETE",
         headers: {
+          Authorization: `Bearer ${idToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -81,11 +94,6 @@ export default function Cart() {
       });
     }
   }
-
-
-  
-
-  
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">

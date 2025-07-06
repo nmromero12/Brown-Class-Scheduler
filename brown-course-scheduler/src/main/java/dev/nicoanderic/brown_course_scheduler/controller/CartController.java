@@ -4,6 +4,8 @@ import dev.nicoanderic.brown_course_scheduler.model.CartItem;
 import dev.nicoanderic.brown_course_scheduler.repository.CartItemRepository;
 import dev.nicoanderic.brown_course_scheduler.service.CartService;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,10 @@ public class CartController {
    */
   @GetMapping("/user/{userId}")
   public Object getCartItem(@PathVariable String userId) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println("Authenticated user: " + auth.getName());
+    System.out.println("Requested userId: " + userId);
+
     return cartService.getCartItems(userId);
   }
 
