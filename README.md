@@ -29,18 +29,17 @@ This project allows users to find their courses through course codes and login w
 
 ---
 
-## Technologies Used
+## 🧱 Technologies Used
 
-- Java  
-- Spring Boot  
-- TypeScript  
-- React  
-- Google Calendar API  
-- Clerk Authentication  
-- Selenium  
-- PostgreSQL  
-- Google Cloud Platform  
+### Frontend
+- **React** with **TypeScript** — for building the user interface  
+- **Tailwind CSS** — utility-first CSS framework for styling  
+- **Firebase Authentication** — secure email/password sign-in and password reset  
 
+### Backend
+- **Java** with **Spring Boot** — REST API and business logic  
+- **PostgreSQL** — relational database for persistent data storage  
+- **Python with Selenium** — web scraping to collect course data used by the backend 
 ---
 
 
