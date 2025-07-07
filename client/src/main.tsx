@@ -15,6 +15,7 @@ import { getFirestore } from "firebase/firestore";
 import Layout  from "./components/Layout.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
 import { CartProvider } from "./context/CartContext.tsx";
+import ForgotPassword from "./components/ForgotPassword.tsx";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -59,7 +60,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="*" element={<Navigate to="/" />} />
+
           </Routes>
         </Router>
       </CartProvider>

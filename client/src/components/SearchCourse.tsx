@@ -1,7 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import { useCart } from "../context/CartContext";
 import { getAuth } from "firebase/auth";
-import { Search, Plus, Clock, GraduationCap, Hash } from "lucide-react";
+import { Search, Plus, Clock, GraduationCap, Hash, Currency } from "lucide-react";
 import { CartItem, Course } from "../types/course";
 
 /**
@@ -18,6 +18,7 @@ export function SearchCourse() {
     const [searchInput, setSearchInput] = useState("");
     const auth = getAuth();
     const user = auth.currentUser;
+    
 
 
     /**
@@ -26,7 +27,7 @@ export function SearchCourse() {
      * @param event - The input change event.
      */
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const cleaned = event.target.value.replace(/\s+/g, '').toUpperCase();
+        const cleaned = event.target.value.replace(/[^a-z0-9]/gi, '').toUpperCase();
         setSearchCode(cleaned);
     };
 
@@ -52,9 +53,16 @@ export function SearchCourse() {
         setIsLoading(true);
         setCourses(null);
         setResultMessage("");
+        const idToken = await user?.getIdToken()
+        
         
         try {
-            const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`);
+            const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      })
             const data = await response.json();
             
             if (data.result === "success") {
@@ -67,6 +75,7 @@ export function SearchCourse() {
             }
         } catch (error: any) {
             setResultMessage("Sorry connection to server failed");
+            console.log(error)
         } finally {
             setIsLoading(false);
         }
@@ -78,9 +87,12 @@ export function SearchCourse() {
      */
     async function addtoCartRepository(cartItem: CartItem) {
         try {
+
+            const idToken = await user?.getIdToken()
             const response = await fetch('http://localhost:8080/cart/addToCart', {
                 method: "POST",
                 headers: {
+                    Authorization: `Bearer ${idToken}`,
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(cartItem)
@@ -96,6 +108,7 @@ export function SearchCourse() {
         }
     }
 
+    
     /**
      * Handles adding a course to the cart and repository.
      * Checks if the user is logged in.
@@ -137,7 +150,8 @@ export function SearchCourse() {
 
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6"
+        >
             {/* Search Interface */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">Find Courses</h2>
@@ -154,7 +168,7 @@ export function SearchCourse() {
                                 type="text"
                                 value={searchCode}
                                 onChange={handleInputChange}
-                                placeholder="e.g., CSCI 0320, ANTH 0100"
+                                placeholder="e.g., CSCI0320, ANTH0100"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brown-500 focus:border-brown-500 transition-colors"
                             />
                         </div>

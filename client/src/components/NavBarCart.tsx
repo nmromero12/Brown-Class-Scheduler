@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useCart } from "../context/CartContext";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { X, Calendar } from "lucide-react";
+import cartIcon from "./assets/shopping-cart.png";
 
 /**
  * NavBarCart component displays the user's cart in a dropdown.
@@ -61,15 +62,28 @@ export default function NavBarCart() {
    * Fetches and initializes the cart for a given user ID.
    * @param uid - The user's unique ID.
    */
-  async function populateCartForUser(uid: string) {
+  async function populateCartForUser(currentUser: any) {
     try {
-      const response = await fetch(`http://localhost:8080/cart/user/${uid}`);
+      const idToken = await currentUser.getIdToken();
+      const response = await fetch(`http://localhost:8080/cart/user/${currentUser.uid}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       if (data.result === "success") {
         initializeCart(data.items);
+      } else {
+        console.error("Failed to populate cart:", data);
       }
     } catch (error: any) {
-      console.log(error);
+      console.error("Error populating cart:", error);
     }
   }
 
@@ -84,10 +98,11 @@ export default function NavBarCart() {
     }
     
     try {
-      console.log("Attempting to delete item - CRN:", crn, "User ID:", user.uid);
+      const idToken = await user.getIdToken();
       const response = await fetch(`http://localhost:8080/cart/deleteItem?crn=${crn}&username=${user.uid}`, {
         method: "DELETE",
         headers: {
+          Authorization: `Bearer ${idToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -114,7 +129,7 @@ export default function NavBarCart() {
       {/* Cart Icon */}
       <img
         ref={cartIconRef}
-        src="src/components/assets/shopping-cart.png"
+        src={cartIcon}
         alt="Cart Icon"
         onClick={toggleCart}
         className="cursor-pointer hover:opacity-80 transition"

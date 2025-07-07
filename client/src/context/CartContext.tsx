@@ -1,6 +1,7 @@
 import { createContext, useState, useCallback, useEffect } from "react";
 import { Course, CartItem } from "../types/course";
 import { ReactNode, useContext } from "react";
+import { getAuth } from "firebase/auth";
 
 type CartProviderProps = {
   children: ReactNode;
@@ -34,6 +35,7 @@ export function CartProvider({ children }: CartProviderProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [icsData, setIcsData] = useState<string | null>(null);
   const [parsedEvents, setParsedEvents] = useState<any[]>([]);
+  const auth = getAuth()
 
   /**
    * Adds a course to the cart if it is not already present.
@@ -69,9 +71,12 @@ export function CartProvider({ children }: CartProviderProps) {
    */
   const parseCart = useCallback(async (cart: CartItem[]) => {
     try {
+      const idToken = await auth.currentUser?.getIdToken()
       const parsedResponse = await fetch("http://localhost:8080/api/calendar/parse-cart", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json" },
         body: JSON.stringify(cart),
       });
       const parsedData = await parsedResponse.json();
@@ -79,7 +84,9 @@ export function CartProvider({ children }: CartProviderProps) {
 
       const icsResponse = await fetch("http://localhost:8080/api/calendar/ics", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "application/json" },
         body: JSON.stringify(parsedData),
       });
       const ics = await icsResponse.text();
