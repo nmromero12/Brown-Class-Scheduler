@@ -7,7 +7,12 @@ A course scheduler for Brown University students to find their courses and add t
 
 ## About
 
-This project allows users to find their courses through course codes and login with Gmail using Google OAuth. It saves time for students by enabling them to find their classes and add them directly to their Google Calendar, expediting the scheduling process.
+Brown Class Scheduler is a comprehensive full-stack web application designed specifically for Brown University students to efficiently plan and manage their course schedules and exams. It features secure user authentication, a responsive and intuitive interface, and collaborative tools such as a friends system and shared calendars.
+
+The backend leverages Java and Spring Boot for robust API services, integrating PostgreSQL for persistent data storage. Course data is dynamically sourced through Selenium-powered web scraping and synchronized with the official Courses at Brown API to ensure up-to-date and accurate academic information.
+
+This platform empowers students to seamlessly organize their academic life, share schedules with peers, and export calendar data to Google Calendar.
+
 
 **Note:** This project is currently in active development and not yet finished.
 
