@@ -49,7 +49,7 @@ const Login = () => {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-brown-700 rounded-full mb-4 animate-bounce">
                         <span className="text-white font-bold text-xl">B</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-brown-800 mb-2 animate-pulse">
+                    <h1 className="text-3xl font-bold text-brown-800 mb-2">
                         Welcome to Brown Class Scheduler
                     </h1>
                     <p className="text-brown-600">

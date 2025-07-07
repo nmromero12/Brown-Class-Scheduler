@@ -29,7 +29,10 @@ const ForgotPassword = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 to-brown-200 p-6">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 to-brown-200 p-6"
+        style={{
+  background: 'linear-gradient(135deg, rgb(190, 137, 84) 0%, rgb(243, 216, 216) 60%, rgb(190, 137, 85) 100%)',
+}}>
             <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
                 <h2 className="text-2xl font-bold text-brown-800 mb-6 text-center">
                     Forgot Your Password?
