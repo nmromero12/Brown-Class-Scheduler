@@ -53,7 +53,8 @@ export function CartProvider({ children }: CartProviderProps) {
    */
   const removeFromCart = useCallback(async (course: CartItem) => {
     setCartItems((currItems) => {
-      return currItems.filter((items) => items.crn !== course.crn);
+      const newCart =  currItems.filter((items) => items.crn !== course.crn);
+      return newCart
     });
   }, []);
 
@@ -101,7 +102,7 @@ export function CartProvider({ children }: CartProviderProps) {
    * Effect to parse cart whenever cartItems changes.
    */
   useEffect(() => {
-    if (cartItems.length > 0) {
+    if (cartItems.length >= 0) {
       parseCart(cartItems);
     } else {
       setIcsData(null);

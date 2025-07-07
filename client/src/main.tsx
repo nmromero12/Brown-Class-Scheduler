@@ -16,6 +16,7 @@ import Layout  from "./components/Layout.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
 import { CartProvider } from "./context/CartContext.tsx";
 import ForgotPassword from "./components/ForgotPassword.tsx";
+import About from "./components/About.tsx";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -56,6 +57,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route index element={<App />} />
               <Route path="calendar" element={<CalendarView />} />
               <Route path="friends" element={<Friends />} />
+              <Route path="about" element={<About/>} />
             </Route>
 
               <Route path="/login" element={<Login />} />
