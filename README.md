@@ -13,12 +13,19 @@ This project allows users to find their courses through course codes and login w
 
 ---
 
-## Features
+## ✨ Features
 
-- Search bar to quickly find courses by course code  
-- In-app calendar to view and manage selected courses  
-- Cart feature to add and organize courses before finalizing schedule  
-- Integration with Google Calendar to sync selected courses directly  
+- 🔐 Secure Firebase email/password authentication  
+- 🧾 Add courses to your personal cart  
+- 🗓️ In-app calendar displaying your course schedule  
+- 📤 Export your schedule to Google Calendar  
+- 👥 Add friends and send/accept friend requests  
+- 🔍 View your friends' schedules in the calendar  
+- 🧩 Overlay your schedule with a friend's for comparison  
+- 🐍 Uses data scraped with Selenium to send POST requests as payloads to the Courses at Brown API, populating and updating course information  
+- 📦 Full REST API with Spring Boot + PostgreSQL backend  
+- 🎨 Tailwind CSS UI for a modern, responsive experience  
+  
 
 ---
 
