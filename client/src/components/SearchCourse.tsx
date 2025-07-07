@@ -27,7 +27,7 @@ export function SearchCourse() {
      * @param event - The input change event.
      */
     const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const cleaned = event.target.value.replace(/\s+/g, '').toUpperCase();
+        const cleaned = event.target.value.replace(/[^a-z0-9]/gi, '').toUpperCase();
         setSearchCode(cleaned);
     };
 
@@ -168,7 +168,7 @@ export function SearchCourse() {
                                 type="text"
                                 value={searchCode}
                                 onChange={handleInputChange}
-                                placeholder="e.g., CSCI 0320, ANTH 0100"
+                                placeholder="e.g., CSCI0320, ANTH0100"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brown-500 focus:border-brown-500 transition-colors"
                             />
                         </div>

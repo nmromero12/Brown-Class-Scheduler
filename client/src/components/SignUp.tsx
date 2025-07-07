@@ -40,7 +40,8 @@ const SignUp = () => {
             navigate("/")
         }).catch(error => {
             console.log(error);
-            setError(error.message);
+            const cleanedMessage = error.message.replace(/^Firebase:\s*/, '').replace(/\s*\(.*\)$/, '');
+            setError(cleanedMessage);
             setAuthing(false);
         })
     }

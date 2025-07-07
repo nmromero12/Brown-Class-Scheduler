@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useCart } from "../context/CartContext";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { X, Calendar } from "lucide-react";
+import cartIcon from "./assets/shopping-cart.png";
 
 /**
  * NavBarCart component displays the user's cart in a dropdown.
@@ -128,7 +129,7 @@ export default function NavBarCart() {
       {/* Cart Icon */}
       <img
         ref={cartIconRef}
-        src="src/components/assets/shopping-cart.png"
+        src={cartIcon}
         alt="Cart Icon"
         onClick={toggleCart}
         className="cursor-pointer hover:opacity-80 transition"

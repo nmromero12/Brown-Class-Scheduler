@@ -31,7 +31,8 @@ const Login = () => {
         })
         .catch((error) => {
             console.log(error);
-            setError(error.message);
+            const cleanedMessage = error.message.replace(/^Firebase:\s*/, '').replace(/\s*\(.*\)$/, '');
+            setError(cleanedMessage);
             setAuthing(false);
         });
     }
@@ -45,10 +46,10 @@ const Login = () => {
             <div className="w-full max-w-md">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-brown-700 rounded-full mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-brown-700 rounded-full mb-4 animate-bounce">
                         <span className="text-white font-bold text-xl">B</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-brown-800 mb-2">
+                    <h1 className="text-3xl font-bold text-brown-800 mb-2 animate-pulse">
                         Welcome to Brown Class Scheduler
                     </h1>
                     <p className="text-brown-600">
