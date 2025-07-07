@@ -22,7 +22,7 @@ function App() {
           {/* Welcome Section */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Welcome to Course Scheduler
+              Welcome to Brown Course Scheduler
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Search and organize your Brown University courses with ease. Build your perfect schedule by searching for courses and adding them to your personalized calendar.

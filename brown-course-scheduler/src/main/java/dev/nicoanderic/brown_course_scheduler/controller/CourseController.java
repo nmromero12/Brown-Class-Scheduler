@@ -36,10 +36,6 @@ public class CourseController {
    *
    * @return An object representing course information (likely a list or map)
    */
-  @GetMapping("/fetch-courses")
-  public Object fetchCourses() {
-    return cabService.fetchCourseInformation();
-  }
 
   /**
    * Endpoint to fetch course details by course code.

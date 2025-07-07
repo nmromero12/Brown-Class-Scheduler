@@ -70,6 +70,17 @@ export default function Navbar() {
             >
               Friends
             </NavLink>
+
+            <NavLink
+              to="/About"
+              className={({ isActive }) =>
+                isActive
+                  ? "underline text-yellow-300"
+                  : "hover:text-yellow-300"
+              }
+            >
+              About
+            </NavLink>
             
           </div>
         </div>
