@@ -44,7 +44,7 @@ This platform empowers students to seamlessly organize their academic life, shar
 ### Backend
 - **Java** with **Spring Boot** — REST API and business logic  
 - **PostgreSQL** — relational database for persistent data storage  
-- **Python with Selenium** — web scraping to collect course data used by the backend 
+- **Java with Selenium** — web scraping to collect course data used by the backend 
 ---
 
 
