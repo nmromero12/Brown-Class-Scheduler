@@ -1,5 +1,5 @@
 import { createContext, useState, useCallback, useEffect } from "react";
-import { Course, CartItem } from "../types/course";
+import { CartItem } from "../types/course";
 import { ReactNode, useContext } from "react";
 import { getAuth } from "firebase/auth";
 

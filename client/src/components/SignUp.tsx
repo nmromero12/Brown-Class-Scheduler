@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword} from 'firebase/auth';
+import { getAuth,  createUserWithEmailAndPassword} from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { addUser } from "../firebase/friends";
 

@@ -37,12 +37,8 @@ export { app, auth, db }
 
 
 setPersistence(authentication, browserSessionPersistence)
-  .then(() => {
-    console.log("Session persistence set");
-  })
-  .catch((error) => {
-    console.error("Error setting session persistence", error);
-  });
+  
+  
 
 
 

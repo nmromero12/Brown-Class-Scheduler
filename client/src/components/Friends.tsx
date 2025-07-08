@@ -18,7 +18,7 @@ export function Friends() {
     const [isSearching, setIsSearching] = useState(false);
     const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([]);
     const [friends, setFriends] = useState<Friend[]>([]);
-    const [acceptedRequests, setAcceptedRequests] = useState<string[]>([]);
+    const [acceptedRequests] = useState<string[]>([]);
     const { user } = useUser();
 
     /**
@@ -308,7 +308,7 @@ export function Friends() {
                 <button onClick={async () => {
                   const curUser = auth.currentUser
                   if (curUser) {
-                  await removeFriend(curUser.uid, friend.uid, curUser.email!, friend.email)
+                  await removeFriend(curUser.uid, friend.uid)
                   setFriends(prev => prev.filter(r => r.uid != friend.uid))
                 }
                 }}className="text-red-600 hover:text-red-800" title="Remove Friend">🗑️</button>

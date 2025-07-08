@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp, deleteDoc, collection, query, where, getDocs, DocumentSnapshot } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db, auth } from "../main.tsx";
 import { Friend, FriendRequest } from "../types/friend";
 
@@ -131,7 +131,7 @@ export async function declineFriendRequest(userId: string, friendId: string) {
  * @param friendEmail - The email of the friend.
  * @param userEmail - The email of the user.
  */
-export async function removeFriend(userId: string, friendId: string, friendEmail: string, userEmail:string) {
+export async function removeFriend(userId: string, friendId: string, ) {
     const friendsRef = collection(db, "users", userId, "friends");
     const usersRef = collection(db, "users", friendId, "friends");
     await deleteDoc(doc(friendsRef, friendId))

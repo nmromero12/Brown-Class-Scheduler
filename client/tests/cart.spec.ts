@@ -3,8 +3,7 @@ import { test, expect, Page } from '@playwright/test';
 const TEST_USER_EMAIL = 'testuser@brown.edu';
 const TEST_USER_PASSWORD = 'TestPassword123!';
 
-const SECOND_USER_EMAIL = 'testuser1234@brown.edu';
-const SECOND_USER_PASSWORD = 'password1234';
+
 
 
 
