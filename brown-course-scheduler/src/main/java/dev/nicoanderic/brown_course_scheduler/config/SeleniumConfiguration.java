@@ -1,14 +1,16 @@
 package dev.nicoanderic.brown_course_scheduler.config;
 
+
 import jakarta.annotation.PostConstruct;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
 @Configuration
 public class SeleniumConfiguration {
-//  @PostConstruct
+  //  @PostConstruct
 //  void postConstruct() {
 //    System.setProperty("webdriver.chrome.driver", "/home/nromero/driver/chromedriver-linux64/chromedriver");
 //  }
@@ -20,4 +22,6 @@ public class SeleniumConfiguration {
     return new ChromeDriver(options);
   }
 
+
 }
+

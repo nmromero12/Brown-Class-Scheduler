@@ -261,6 +261,8 @@ export default function CalendarView() {
       {/* Modal Popup for Event Details */}
       {selectedEvent && (
         <>
+        {/* 🔒 Overlay to disable all interactions */}
+           <div className="fixed inset-0 z-50 pointer-events-auto"></div>
   
 
           {/* Modal Box */}

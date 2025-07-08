@@ -105,7 +105,7 @@ export default function Cart() {
       </div>
 
       {/* Schedule Items */}
-      {cartItems.length > 0 ? (
+      {cartItems.length > 0 ? ( 
         <div className="space-y-3 mb-6">
           {cartItems.map((course) => (
             <div key={course.crn} className="bg-gray-50 rounded-lg p-4 border-l-4 border-brown-500">
