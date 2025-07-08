@@ -1,7 +1,7 @@
 import { useState, ChangeEvent } from "react";
 import { useCart } from "../context/CartContext";
 import { getAuth } from "firebase/auth";
-import { Search, Plus, Clock, GraduationCap, Hash, Currency } from "lucide-react";
+import { Search, Plus, Clock, GraduationCap, Hash} from "lucide-react";
 import { CartItem, Course } from "../types/course";
 
 /**

@@ -29,7 +29,7 @@ export default function NavBarCart() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        populateCartForUser(currentUser.uid);
+        populateCartForUser(currentUser);
       } else {
         initializeCart([]);
       }
@@ -64,7 +64,7 @@ export default function NavBarCart() {
    */
   async function populateCartForUser(currentUser: any) {
     try {
-      const idToken = await currentUser.getIdToken();
+      const idToken = await currentUser.getIdToken()
       const response = await fetch(`http://localhost:8080/cart/user/${currentUser.uid}`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
@@ -80,7 +80,7 @@ export default function NavBarCart() {
       if (data.result === "success") {
         initializeCart(data.items);
       } else {
-        console.error("Failed to populate cart:", data);
+        console.log("No cart items for user")
       }
     } catch (error: any) {
       console.error("Error populating cart:", error);
