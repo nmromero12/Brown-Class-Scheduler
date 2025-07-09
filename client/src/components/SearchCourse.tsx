@@ -68,14 +68,12 @@ export function SearchCourse() {
             if (data.result === "success") {
                 setCourses(data.courses);
                 setError(false);
-                console.log(data.courses);
             } else {
                 setCourses(null);
                 setResultMessage(data.message);
             }
         } catch (error: any) {
             setResultMessage("Sorry connection to server failed");
-            console.log(error)
         } finally {
             setIsLoading(false);
         }
@@ -102,9 +100,8 @@ export function SearchCourse() {
             if (!response.ok) {
                 throw new Error("Failed to add item");
             }
-            console.log("Item added successfully");
+            
         } catch (error: any) {
-            console.log(error);
         }
     }
 

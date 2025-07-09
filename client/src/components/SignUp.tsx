@@ -31,7 +31,6 @@ const SignUp = () => {
         setError('');
 
         createUserWithEmailAndPassword(auth, email, password).then(response => {
-            console.log(response.user.uid);
             addUser(response.user.uid, {
                 email: response.user.email,
                 createdAt: new Date(),
@@ -39,7 +38,6 @@ const SignUp = () => {
             })
             navigate("/")
         }).catch(error => {
-            console.log(error);
             const cleanedMessage = error.message.replace(/^Firebase:\s*/, '').replace(/\s*\(.*\)$/, '');
             setError(cleanedMessage);
             setAuthing(false);

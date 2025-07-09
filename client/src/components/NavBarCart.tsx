@@ -79,11 +79,9 @@ export default function NavBarCart() {
       const data = await response.json();
       if (data.result === "success") {
         initializeCart(data.items);
-      } else {
-        console.log("No cart items for user")
-      }
+      } 
     } catch (error: any) {
-      console.error("Error populating cart:", error);
+      
     }
   }
 
@@ -93,7 +91,7 @@ export default function NavBarCart() {
    */
   async function deleteFromCartRepository(crn: string) {
     if (!user) {
-      console.error("Delete failed: No user ID available");
+      
       return;
     }
     
@@ -108,12 +106,10 @@ export default function NavBarCart() {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Server response:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      console.log("Successfully deleted item - CRN:", crn, "User ID:", user.uid);
+      
     } catch (error: any) {
       console.error("Error deleting item:", {
         crn,
