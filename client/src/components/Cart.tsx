@@ -3,6 +3,7 @@ import { useCart } from "../context/CartContext";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Calendar, Clock, GraduationCap, X } from "lucide-react";
+import { errors } from "@playwright/test";
 
 /**
  * Cart component for displaying and managing the user's course schedule.
@@ -51,10 +52,10 @@ export default function Cart() {
       if (data.result === "success") {
         initializeCart(data.items);
       } else {
-        console.error("Failed to populate cart:", data);
+        throw new Error("cannot reach server")
       }
     } catch (error: any) {
-      console.error("Error populating cart:", error);
+      return
     }
   }
 
@@ -64,7 +65,6 @@ export default function Cart() {
    */
   async function deleteFromCartRepository(crn: string) {
     if (!user) {
-      console.error("Delete failed: No user ID available");
       return;
     }
     
@@ -79,21 +79,16 @@ export default function Cart() {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Server response:", errorText);
+      
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      console.log("Successfully deleted item - CRN:", crn, "User ID:", user.uid);
+      
     } catch (error: any) {
-      console.error("Error deleting item:", {
-        crn,
-        user: user.uid,
-        error: error.message,
-        stack: error.stack
-      });
+        throw new Error("Error deleting item");
+      };
     }
-  }
+  
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-24">

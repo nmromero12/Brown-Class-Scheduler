@@ -25,12 +25,11 @@ const Login = () => {
         setError('');
 
         signInWithEmailAndPassword(auth, email, password)
-        .then(response => {
-            console.log(response.user.uid);
+        .then(() => {
             navigate('/');
         })
         .catch((error) => {
-            console.log(error);
+            
             const cleanedMessage = error.message.replace(/^Firebase:\s*/, '').replace(/\s*\(.*\)$/, '');
             setError(cleanedMessage);
             setAuthing(false);
