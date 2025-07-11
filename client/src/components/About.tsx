@@ -28,7 +28,6 @@ export default function About() {
   <h2 className="text-2xl font-semibold mb-2">About the Developer</h2>
   <p className="mb-4">
     This project was built by Nicholas Romero, a student who got tired of manually copying course times into his personal calendar every semester. 
-    Too lazy to do it himself one more time, he built Course Scheduler — and now everyone gets to benefit from that laziness turned productivity.
   </p>
   <p>
     For any questions, suggestions or to report a bug, feel free to send an email to <a href="mailto:nromero4792@gmail.com" className="text-blue-600 underline">nromero4792@gmail.com</a>.

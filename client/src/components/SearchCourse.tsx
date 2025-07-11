@@ -4,6 +4,8 @@ import { getAuth } from "firebase/auth";
 import { Search, Plus, Clock, GraduationCap, Hash} from "lucide-react";
 import { CartItem, Course } from "../types/course";
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 /**
  * SearchCourse component for searching and adding courses to the cart.
  * @returns JSX.Element
@@ -57,7 +59,7 @@ export function SearchCourse() {
         
         
         try {
-            const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`, {
+            const response = await fetch(`${API_BASE}/api/courses/code/${searchCode}`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
           "Content-Type": "application/json",
@@ -87,7 +89,7 @@ export function SearchCourse() {
         try {
 
             const idToken = await user?.getIdToken()
-            const response = await fetch('http://localhost:8080/cart/addToCart', {
+            const response = await fetch(`${API_BASE}/cart/addToCart`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${idToken}`,

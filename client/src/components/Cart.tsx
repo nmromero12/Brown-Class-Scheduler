@@ -3,8 +3,9 @@ import { useCart } from "../context/CartContext";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Calendar, Clock, GraduationCap, X } from "lucide-react";
-import { errors } from "@playwright/test";
 
+
+const API_BASE = import.meta.env.VITE_API_BASE;
 /**
  * Cart component for displaying and managing the user's course schedule.
  * Handles cart state, user authentication, and cart item management.
@@ -37,7 +38,7 @@ export default function Cart() {
   async function populateCartForUser(currentUser: any) {
     try {
       const idToken = await currentUser.getIdToken();
-      const response = await fetch(`http://localhost:8080/cart/user/${currentUser.uid}`, {
+      const response = await fetch(`${API_BASE}/cart/user/${currentUser.uid}`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
           "Content-Type": "application/json",
@@ -70,7 +71,7 @@ export default function Cart() {
     
     try {
       const idToken = await user.getIdToken();
-      const response = await fetch(`http://localhost:8080/cart/deleteItem?crn=${crn}&username=${user.uid}`, {
+      const response = await fetch(`${API_BASE}/cart/deleteItem?crn=${crn}&username=${user.uid}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${idToken}`,

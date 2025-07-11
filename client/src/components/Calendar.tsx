@@ -11,6 +11,8 @@ import { useUser } from '../context/UserContext';
 import { CartItem } from '../types/course';
 import { Friend } from '../types/friend';
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 /**
  * CalendarView component displays the user's and friends' course schedules.
  * Allows viewing friends' schedules on the calendar.
@@ -34,7 +36,7 @@ export default function CalendarView() {
    */
   async function fetchParsedEvents(cart: CartItem[]): Promise<any[]> {
     const idToken = await user?.getIdToken()
-    const response = await fetch("http://localhost:8080/api/calendar/parse-cart", {
+    const response = await fetch(`${API_BASE}/api/calendar/parse-cart`, {
       method: "POST",
       headers: { 
         Authorization: `Bearer ${idToken}`,
@@ -52,7 +54,7 @@ export default function CalendarView() {
    */
   async function fetchFriendCart(friendUid: string) {
     const idToken = await user?.getIdToken()
-    const response = await fetch(`http://localhost:8080/cart/user/${friendUid}`, {
+    const response = await fetch(`${API_BASE}/cart/user/${friendUid}`, {
       headers: {
         Authorization: `Bearer ${idToken}`,
         "Content-Type": "application/json",
