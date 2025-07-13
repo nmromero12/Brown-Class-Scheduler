@@ -184,7 +184,7 @@ export default function CalendarView() {
             headerToolbar={{
               left: 'prev,next today',
               center: 'title',
-              right: 'timeGridWeek,timeGridDay',
+              right: 'timeGridWeek,timeGridDay', 
             }}
             events={[...myEvents, ...friendEvents]}
             height="auto"
