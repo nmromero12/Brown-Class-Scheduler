@@ -13,8 +13,12 @@ The backend leverages Java and Spring Boot for robust API services, integrating 
 
 This platform empowers students to seamlessly organize their academic life, share schedules with peers, and export calendar data to Google Calendar.
 
+---
 
-**Note:** This project is currently in active development and not yet finished.
+## Project Link
+
+Check out the live site here:  
+🔗 [https://browncoursescheduler.app/](https://browncoursescheduler.app/)
 
 ---
 
@@ -31,6 +35,14 @@ This platform empowers students to seamlessly organize their academic life, shar
 - 📦 Full REST API with Spring Boot + PostgreSQL backend  
 - 🎨 Tailwind CSS UI for a modern, responsive experience  
   
+
+---
+
+## Deployment
+
+- **Frontend** deployed on **Firebase Hosting**  
+- **Backend** hosted on **AWS**  
+- **Database** managed with **PostgreSQL**
 
 ---
 
