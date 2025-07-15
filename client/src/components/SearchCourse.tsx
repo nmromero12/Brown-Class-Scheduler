@@ -158,6 +158,14 @@ export function SearchCourse() {
     return (
         <div className="space-y-6"
         >
+            <div className="text-sm text-gray-600">
+    <a href="https://cab.brown.edu/" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       className="underline hover:text-brown-700">
+        Browse the full Brown Course Catalog
+    </a>
+</div>
             {/* Search Interface */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">Find Courses</h2>

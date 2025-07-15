@@ -157,7 +157,7 @@ export function Friends() {
       <div className="p-6 space-y-4">
         <h2 className="text-2xl font-semibold text-gray-900">Find Friends</h2>
         <div className="flex gap-4">
-          <input type="text" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} onKeyDown={handleKeyDown} placeholder="e.g., john_doe, jane@brown.edu" className="flex-1 border rounded px-4 py-2" />
+          <input type="text" value={userSearch} onChange={(e) => setUserSearch(e.target.value)} onKeyDown={handleKeyDown} placeholder="student@brown.edu" className="flex-1 border rounded px-4 py-2" />
           <button onClick={()=>{
             handleSearch()
 

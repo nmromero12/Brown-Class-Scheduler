@@ -1,7 +1,7 @@
 export default function About() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 text-gray-800">
-      <h1 className="text-4xl font-bold mb-6 text-center">About Course Scheduler</h1>
+      <h1 className="text-4xl font-bold mb-6 text-center">About Brown Course Scheduler</h1>
 
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-2">What is Course Scheduler?</h2>
