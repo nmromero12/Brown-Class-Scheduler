@@ -147,6 +147,13 @@ export function SearchCourse() {
 
     }
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+        fetchCourses();
+        handleSearch();
+    }
+};
+
 
     return (
         <div className="space-y-6"
@@ -167,6 +174,7 @@ export function SearchCourse() {
                                 type="text"
                                 value={searchCode}
                                 onChange={handleInputChange}
+                                onKeyDown={handleKeyDown}
                                 placeholder="e.g., CSCI0320, ANTH0100"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brown-500 focus:border-brown-500 transition-colors"
                             />
