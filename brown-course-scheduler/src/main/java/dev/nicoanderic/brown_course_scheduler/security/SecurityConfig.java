@@ -41,7 +41,8 @@ public class SecurityConfig {
     config.setAllowedOrigins(List.of(
         "http://localhost:5173",  // Local frontend
         "https://brown-class-scheduler-198ff.web.app",  // Another frontend
-        "https://browncoursescheduler.app"  // Production frontend
+        "https://browncoursescheduler.app",
+        "https://www.browncoursescheduler.app"// Production frontend
     ));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
