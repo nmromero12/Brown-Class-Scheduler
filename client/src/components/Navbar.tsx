@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { getAuth, signOut } from "firebase/auth";
 import NavBarCart from "./NavBarCart";
-
+import brownLogo from "./assets/brownB.jpg"
 /**
  * Navbar component for navigation and user actions.
  * Displays navigation links, cart, and sign out button.
@@ -28,7 +28,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <img
-              src="src/components/assets/brownB.jpg"
+              src={brownLogo}
               alt="Logo"
               style={{ width: 35 }}
             />

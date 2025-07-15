@@ -4,6 +4,8 @@ import { getAuth } from "firebase/auth";
 import { Search, Plus, Clock, GraduationCap, Hash} from "lucide-react";
 import { CartItem, Course } from "../types/course";
 
+const API_BASE = import.meta.env.VITE_API_BASE;
+
 /**
  * SearchCourse component for searching and adding courses to the cart.
  * @returns JSX.Element
@@ -57,7 +59,7 @@ export function SearchCourse() {
         
         
         try {
-            const response = await fetch(`http://localhost:8080/api/courses/code/${searchCode}`, {
+            const response = await fetch(`${API_BASE}/api/courses/code/${searchCode}`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
           "Content-Type": "application/json",
@@ -87,7 +89,7 @@ export function SearchCourse() {
         try {
 
             const idToken = await user?.getIdToken()
-            const response = await fetch('http://localhost:8080/cart/addToCart', {
+            const response = await fetch(`${API_BASE}/cart/addToCart`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${idToken}`,
@@ -145,10 +147,25 @@ export function SearchCourse() {
 
     }
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+        fetchCourses();
+        handleSearch();
+    }
+};
+
 
     return (
         <div className="space-y-6"
         >
+            <div className="text-sm text-gray-600">
+    <a href="https://cab.brown.edu/" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       className="underline hover:text-brown-700">
+        Browse the full Brown Course Catalog
+    </a>
+</div>
             {/* Search Interface */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h2 className="text-2xl font-semibold text-gray-900 mb-6">Find Courses</h2>
@@ -165,6 +182,7 @@ export function SearchCourse() {
                                 type="text"
                                 value={searchCode}
                                 onChange={handleInputChange}
+                                onKeyDown={handleKeyDown}
                                 placeholder="e.g., CSCI0320, ANTH0100"
                                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brown-500 focus:border-brown-500 transition-colors"
                             />

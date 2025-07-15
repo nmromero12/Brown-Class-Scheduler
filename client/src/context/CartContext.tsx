@@ -3,6 +3,8 @@ import { CartItem } from "../types/course";
 import { ReactNode, useContext } from "react";
 import { getAuth } from "firebase/auth";
 
+
+
 type CartProviderProps = {
   children: ReactNode;
 };
@@ -18,7 +20,7 @@ type CartContextItems = {
 };
 
 const CartContext = createContext({} as CartContextItems);
-
+const API_BASE = import.meta.env.VITE_API_BASE;
 /**
  * Custom hook to access the cart context.
  * @returns The cart context value.
@@ -73,7 +75,7 @@ export function CartProvider({ children }: CartProviderProps) {
   const parseCart = useCallback(async (cart: CartItem[]) => {
     try {
       const idToken = await auth.currentUser?.getIdToken()
-      const parsedResponse = await fetch("http://localhost:8080/api/calendar/parse-cart", {
+      const parsedResponse = await fetch(`${API_BASE}/api/calendar/parse-cart`, {
         method: "POST",
         headers: { 
           Authorization: `Bearer ${idToken}`,
@@ -83,7 +85,7 @@ export function CartProvider({ children }: CartProviderProps) {
       const parsedData = await parsedResponse.json();
       setParsedEvents(parsedData);
 
-      const icsResponse = await fetch("http://localhost:8080/api/calendar/ics", {
+      const icsResponse = await fetch(`${API_BASE}/api/calendar/ics`, {
         method: "POST",
         headers: { 
           Authorization: `Bearer ${idToken}`,

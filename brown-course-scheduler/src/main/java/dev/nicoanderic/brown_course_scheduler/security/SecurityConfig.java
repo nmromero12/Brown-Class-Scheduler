@@ -24,11 +24,11 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Apply CORS configuration here
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/cart/**").authenticated()
-            .requestMatchers("/api/**").authenticated()
-            .anyRequest().permitAll()
+            .requestMatchers("/cart/**").authenticated() // Require authentication for cart endpoints
+            .requestMatchers("/api/**").authenticated() // Require authentication for API endpoints
+            .anyRequest().permitAll() // Allow other requests without authentication
         )
         .addFilterBefore(firebaseAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -38,14 +38,18 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(List.of("http://localhost:5173"));
+    config.setAllowedOrigins(List.of(
+        "http://localhost:5173",  // Local frontend
+        "https://brown-class-scheduler-198ff.web.app",  // Another frontend
+        "https://browncoursescheduler.app",
+        "https://www.browncoursescheduler.app"// Production frontend
+    ));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-    config.setAllowCredentials(true);
+    config.setAllowCredentials(true);  // Allow credentials like cookies or tokens
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
+    source.registerCorsConfiguration("/**", config);  // Apply to all endpoints
     return source;
   }
-
 }
